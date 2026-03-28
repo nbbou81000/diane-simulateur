@@ -11,26 +11,39 @@ const https = require('https');
 const { getStore } = require('@netlify/blobs');
 
 /* ── HTTP GET avec redirections ── */
-function httpsGet(url, binary = false) {
+function httpsGet(url, binary = false, extraHeaders = {}) {
   return new Promise((resolve, reject) => {
     try {
       const req = https.get(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; DIANE-Simulateur/1.0)',
-          'Accept': binary ? 'application/pdf,*/*' : 'text/html,*/*',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': binary ? 'application/pdf,application/octet-stream,*/*' : 'text/html,application/xhtml+xml,*/*;q=0.9',
+          'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+          'Accept-Encoding': 'identity',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Referer': 'https://www.santepubliquefrance.fr/',
+          'Sec-Fetch-Dest': binary ? 'document' : 'navigate',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'same-origin',
+          ...extraHeaders,
         },
       }, (res) => {
         if ([301,302,303,307,308].includes(res.statusCode) && res.headers.location) {
           const next = res.headers.location.startsWith('http')
             ? res.headers.location
             : 'https://www.santepubliquefrance.fr' + res.headers.location;
-          return httpsGet(next, binary).then(resolve).catch(reject);
+          /* Passer les cookies de session si présents */
+          const cookies = res.headers['set-cookie'];
+          const cookieHeader = cookies ? { 'Cookie': cookies.map(c => c.split(';')[0]).join('; ') } : {};
+          return httpsGet(next, binary, cookieHeader).then(resolve).catch(reject);
         }
         const chunks = [];
         res.on('data', c => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
         res.on('end', () => resolve({
-          status: res.statusCode,
-          body:   binary ? Buffer.concat(chunks) : Buffer.concat(chunks).toString('utf-8'),
+          status:  res.statusCode,
+          headers: res.headers,
+          body:    binary ? Buffer.concat(chunks) : Buffer.concat(chunks).toString('utf-8'),
         }));
       });
       req.on('error', reject);
@@ -244,15 +257,28 @@ exports.handler = async function () {
     const pdfUrl = await findLatestPdf();
     console.log('[update-bulletin] PDF:', pdfUrl);
 
-    const pdf = await httpsGet(pdfUrl, true);
+    /* Warm-up : visiter la page principale pour récupérer les cookies de session */
+    console.log('[update-bulletin] Warm-up session SPF…');
+    let sessionCookies = {};
+    try {
+      const warmup = await httpsGet('https://www.santepubliquefrance.fr/surveillance-syndromique-sursaud-R');
+      const setCookie = warmup.headers && warmup.headers['set-cookie'];
+      if (setCookie) {
+        const cookieStr = (Array.isArray(setCookie) ? setCookie : [setCookie])
+          .map(c => c.split(';')[0]).join('; ');
+        sessionCookies = { 'Cookie': cookieStr };
+        console.log('[update-bulletin] Cookies session récupérés');
+      }
+    } catch(e) { console.warn('[update-bulletin] Warm-up échoué (non bloquant):', e.message); }
+
+    const pdf = await httpsGet(pdfUrl, true, sessionCookies);
     if (pdf.status !== 200) throw new Error(`PDF download HTTP ${pdf.status}`);
     /* Vérifier que c'est bien un PDF (commence par %PDF) */
-    const header = pdf.body.slice(0, 10).toString('ascii');
-    console.log(`[update-bulletin] PDF header: "${header}" — taille: ${Math.round(pdf.body.length / 1024)} Ko — URL: ${pdfUrl}`);
-    if (!header.startsWith('%PDF')) {
-      /* Ce n'est pas un PDF — afficher le début du contenu pour debug */
-      const preview = pdf.body.slice(0, 500).toString('utf-8').replace(/\n/g, ' ');
-      throw new Error(`Contenu non-PDF reçu. Header: "${header}". Aperçu: ${preview.slice(0, 200)}`);
+    const pdfHeader = pdf.body.slice(0, 10).toString('ascii');
+    console.log(`[update-bulletin] PDF header: "${pdfHeader}" — taille: ${Math.round(pdf.body.length / 1024)} Ko`);
+    if (!pdfHeader.startsWith('%PDF')) {
+      const preview = pdf.body.slice(0, 300).toString('utf-8').replace(/[\n\r]/g, ' ');
+      throw new Error(`Contenu non-PDF. Header: "${pdfHeader}". Aperçu: ${preview.slice(0, 150)}`);
     }
 
     const data = await extractWithGemini(pdf.body.toString('base64'));
