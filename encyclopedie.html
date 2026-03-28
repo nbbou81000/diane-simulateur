@@ -125,6 +125,202 @@ footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:c
 <div class="scan"></div>
 
 <main>
+<!-- ═══════════════ BULLETIN OSCOUR ═══════════════ -->
+<section id="bulletin-oscour" style="padding:120px 24px 80px">
+  <div class="section-inner">
+
+    <div class="section-label reveal">
+      <span class="mono" style="font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.35);text-transform:uppercase">Veille sanitaire</span>
+    </div>
+
+    <div class="reveal" style="text-align:center;margin-bottom:32px">
+      <h2 style="font-size:clamp(20px,2.8vw,28px);font-weight:700;letter-spacing:-.02em;margin-bottom:8px">
+        Bulletin <span style="background:linear-gradient(135deg,#ff6b6b,#ff3b3b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">OSCOUR®</span> — Réseau National
+      </h2>
+      <p style="font-size:13px;color:rgba(255,255,255,.38);font-family:'JetBrains Mono',monospace;letter-spacing:.05em">
+        SurSaUD® · Point hebdomadaire n°1093 · Semaine 12 (16–22 mars 2026)
+      </p>
+    </div>
+
+    <div id="oscour-card" class="reveal" style="position:relative;background:rgba(6,10,26,0.55);backdrop-filter:blur(28px) saturate(1.6) brightness(1.08);-webkit-backdrop-filter:blur(28px) saturate(1.6) brightness(1.08);border:1px solid rgba(220,80,80,0.2);border-radius:16px;overflow:hidden;max-width:900px;margin:0 auto;font-family:'JetBrains Mono',monospace;box-shadow:0 0 0 1px rgba(200,50,50,.15),0 0 32px 6px rgba(180,30,30,.18),0 0 80px 20px rgba(140,20,20,.14),0 0 140px 50px rgba(100,10,10,.09),inset 0 1px 0 rgba(255,255,255,.06)">
+
+      <!-- Scan line -->
+      <div style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-radius:16px">
+        <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,80,80,0.08),transparent);animation:oscScan 6s linear infinite"></div>
+      </div>
+
+      <!-- Header -->
+      <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:14px 22px 12px;border-bottom:1px solid rgba(220,80,80,0.12);background:rgba(0,0,0,0.2)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span style="font-size:11px;font-weight:700;letter-spacing:.13em;color:rgba(255,255,255,.9);text-transform:uppercase">Bulletin National OSCOUR®</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.06em">700 services · 97,9% couverture nationale</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="width:7px;height:7px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 6px #ff3b3b;display:inline-block;animation:oscBlink 1.2s ease-in-out infinite"></span>
+            <span style="font-size:9px;color:rgba(255,100,100,.8);letter-spacing:.08em;text-transform:uppercase">S12 — 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI résumé -->
+      <div style="position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(220,80,80,0.1)">
+        <div style="padding:16px 18px;border-right:1px solid rgba(255,255,255,.05)">
+          <div style="font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,229,255,.5);margin-bottom:6px">Passages totaux</div>
+          <div style="font-size:24px;font-weight:700;color:#00e5ff;letter-spacing:-.02em;line-height:1">361&nbsp;245</div>
+          <div style="font-size:8px;color:rgba(255,255,255,.25);margin-top:4px">toutes causes · tous âges</div>
+        </div>
+        <div style="padding:16px 18px;border-right:1px solid rgba(255,255,255,.05)">
+          <div style="font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,214,0,.5);margin-bottom:6px">Hospitalisations</div>
+          <div style="font-size:24px;font-weight:700;color:#ffd600;letter-spacing:-.02em;line-height:1">79&nbsp;125</div>
+          <div style="font-size:8px;color:rgba(255,255,255,.25);margin-top:4px">après passage aux urgences</div>
+        </div>
+        <div style="padding:16px 18px;border-right:1px solid rgba(255,255,255,.05)">
+          <div style="font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(167,139,250,.5);margin-bottom:6px">Taux hospit.</div>
+          <div style="font-size:24px;font-weight:700;color:#a78bfa;letter-spacing:-.02em;line-height:1">21,9<span style="font-size:14px">%</span></div>
+          <div style="font-size:8px;color:rgba(255,255,255,.25);margin-top:4px">passages hospitalisés</div>
+        </div>
+        <div style="padding:16px 18px">
+          <div style="font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(251,191,36,.5);margin-bottom:6px">Évolution enfants</div>
+          <div style="font-size:24px;font-weight:700;color:#fbbf24;letter-spacing:-.02em;line-height:1">+10<span style="font-size:14px">%</span></div>
+          <div style="font-size:8px;color:rgba(255,255,255,.25);margin-top:4px">vs semaine précédente</div>
+        </div>
+      </div>
+
+      <!-- Passages par classe d'âge -->
+      <div style="position:relative;z-index:1;padding:14px 22px 12px;border-bottom:1px solid rgba(255,255,255,.05)">
+        <div style="font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:10px">Passages par classe d'âge</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="padding:10px 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:8px">
+            <div style="font-size:8px;color:rgba(0,229,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">&lt; 15 ans</div>
+            <div style="font-size:18px;font-weight:700;color:#00e5ff">83&nbsp;030</div>
+            <div style="margin-top:6px;height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="width:23%;height:100%;background:rgba(0,229,255,.6);border-radius:2px"></div></div>
+          </div>
+          <div style="padding:10px 12px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:8px">
+            <div style="font-size:8px;color:rgba(167,139,250,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">15–74 ans</div>
+            <div style="font-size:18px;font-weight:700;color:#a78bfa">220&nbsp;797</div>
+            <div style="margin-top:6px;height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="width:61%;height:100%;background:rgba(167,139,250,.6);border-radius:2px"></div></div>
+          </div>
+          <div style="padding:10px 12px;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.1);border-radius:8px">
+            <div style="font-size:8px;color:rgba(251,191,36,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">≥ 75 ans</div>
+            <div style="font-size:18px;font-weight:700;color:#fbbf24">57&nbsp;418</div>
+            <div style="margin-top:6px;height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="width:16%;height:100%;background:rgba(251,191,36,.6);border-radius:2px"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hospitalisations par classe d'âge -->
+      <div style="position:relative;z-index:1;padding:14px 22px 12px;border-bottom:1px solid rgba(255,255,255,.05)">
+        <div style="font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:10px">Hospitalisations après passage · par classe d'âge</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div style="padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:8px">
+            <div style="font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.06em;margin-bottom:3px">&lt; 2 ans</div>
+            <div style="font-size:15px;font-weight:700;color:#ffd600">3&nbsp;193</div>
+            <div style="font-size:8px;color:#4caf50;margin-top:2px">+6,2%</div>
+          </div>
+          <div style="padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:8px">
+            <div style="font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.06em;margin-bottom:3px">2–14 ans</div>
+            <div style="font-size:15px;font-weight:700;color:#ffd600">5&nbsp;629</div>
+            <div style="font-size:8px;color:#4caf50;margin-top:2px">+2,8%</div>
+          </div>
+          <div style="padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:8px">
+            <div style="font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.06em;margin-bottom:3px">15–74 ans</div>
+            <div style="font-size:15px;font-weight:700;color:#ffd600">42&nbsp;265</div>
+            <div style="font-size:8px;color:#4caf50;margin-top:2px">+2,8%</div>
+          </div>
+          <div style="padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:8px">
+            <div style="font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.06em;margin-bottom:3px">≥ 75 ans</div>
+            <div style="font-size:15px;font-weight:700;color:#ffd600">28&nbsp;035</div>
+            <div style="font-size:8px;color:#4caf50;margin-top:2px">+3,1%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- En-têtes tableau pathologies -->
+      <div style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 100px 100px 80px;padding:9px 22px 7px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.12)">
+        <span style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.22)">10 pathologies les + fréquentes · tous âges</span>
+        <span style="font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,229,255,.35);text-align:right">Passages</span>
+        <span style="font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,214,0,.35);text-align:right">Sem. préc.</span>
+        <span style="font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(167,139,250,.35);text-align:right">Variation</span>
+      </div>
+
+      <!-- Tableau scrollable -->
+      <div style="position:relative;z-index:1;max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(220,80,80,.3) transparent">
+        <div id="oscour-rows"></div>
+      </div>
+
+      <!-- Points clés -->
+      <div style="position:relative;z-index:1;padding:14px 22px;border-top:1px solid rgba(220,80,80,.1);background:rgba(0,0,0,.1)">
+        <div style="font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:10px">Points clés de la semaine</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#fbbf24;flex-shrink:0;margin-top:1px">▲</span><span style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6">Passages en hausse chez les enfants <strong style="color:rgba(255,255,255,.8)">+10%</strong> (+8 046 passages) · hospitalisations &lt;2 ans <strong style="color:rgba(255,255,255,.8)">+6%</strong></span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#fbbf24;flex-shrink:0;margin-top:1px">▲</span><span style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6">Infections ORL en progression dans toutes les classes d'âge <strong style="color:rgba(255,255,255,.8)">+12%</strong> (+1 218 passages)</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#fbbf24;flex-shrink:0;margin-top:1px">▲</span><span style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6">Fièvre isolée tous âges <strong style="color:rgba(255,255,255,.8)">+17%</strong> · Traumatismes adultes <strong style="color:rgba(255,255,255,.8)">+7%</strong> · 2-14 ans <strong style="color:rgba(255,255,255,.8)">+13%</strong></span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#fbbf24;flex-shrink:0;margin-top:1px">▲</span><span style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6">≥ 75 ans : douleur thoracique <strong style="color:rgba(255,255,255,.8)">+9%</strong> · AVC <strong style="color:rgba(255,255,255,.8)">+7%</strong></span></div>
+        </div>
+      </div>
+
+      <!-- Footer card -->
+      <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:9px 22px;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.15)">
+        <span style="font-size:8.5px;color:rgba(255,255,255,.2);letter-spacing:.04em">Source : Santé Publique France · Bulletin OSCOUR® n°1093 · 24.03.2026</span>
+        <a href="https://www.santepubliquefrance.fr/surveillance-syndromique-sursaud-R" target="_blank" rel="noopener" style="font-size:8.5px;color:rgba(220,80,80,.45);letter-spacing:.04em;text-decoration:none">santepubliquefrance.fr ↗</a>
+      </div>
+
+    </div><!-- /oscour-card -->
+
+    <p class="reveal" style="text-align:center;margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.06em">
+      Mise à jour manuelle hebdomadaire · Données du bulletin national OSCOUR® · Réseau SurSaUD®
+    </p>
+
+  </div>
+</section>
+
+<style>
+@keyframes oscBlink {
+  0%,100% { opacity:1; box-shadow:0 0 8px #ff3b3b,0 0 14px rgba(255,59,59,.4); }
+  50%      { opacity:.25; box-shadow:none; }
+}
+@keyframes oscScan {
+  0%   { top:-2px; }
+  100% { top:100%; }
+}
+</style>
+
+<script>
+(function(){
+  const PATHO = [
+    { label:'Traumatisme',                           semaine:99623,  prec:91728,  var:+8.61,  color:'#00e5ff' },
+    { label:'Douleurs abdominales non spécifiques',  semaine:18245,  prec:18158,  var:+0.48,  color:'#a78bfa' },
+    { label:'Douleur thoracique',                    semaine:13628,  prec:13310,  var:+2.39,  color:'#f87171' },
+    { label:'Malaise',                               semaine:12896,  prec:12574,  var:+2.56,  color:'#fbbf24' },
+    { label:'Infections ORL',                        semaine:11315,  prec:10097,  var:+12.06, color:'#34d399' },
+    { label:'Neurologie autre',                      semaine:10612,  prec:10365,  var:+2.38,  color:'#7eb8d4' },
+    { label:'Douleurs abdominales spécifiques',      semaine:10036,  prec:10055,  var:-0.19,  color:'#a78bfa' },
+    { label:'Infection cutanée / sous-cutanée',      semaine:6071,   prec:5832,   var:+4.10,  color:'#fbbf24' },
+    { label:'Infection urinaire',                    semaine:5602,   prec:5293,   var:+5.84,  color:'#34d399' },
+    { label:'Pneumopathie',                          semaine:4870,   prec:4862,   var:+0.16,  color:'#7eb8d4' },
+  ];
+  const fmt = n => n.toLocaleString('fr-FR');
+  const maxP = Math.max(...PATHO.map(p => p.semaine));
+  document.getElementById('oscour-rows').innerHTML = PATHO.map((p, i) => {
+    const varColor = p.var > 5 ? '#fbbf24' : p.var > 0 ? '#4caf50' : '#f87171';
+    const pct = ((p.semaine / maxP) * 100).toFixed(1);
+    return `<div style="display:grid;grid-template-columns:1fr 100px 100px 80px;align-items:center;padding:9px 22px;${i < PATHO.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.04);' : ''}transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.025)'" onmouseout="this.style.background='transparent'">
+      <div>
+        <div style="font-size:10.5px;font-weight:700;color:${p.color};margin-bottom:4px">${p.label}</div>
+        <div style="height:2px;width:${pct}%;max-width:260px;background:${p.color}55;border-radius:1px"></div>
+      </div>
+      <div style="text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.85)">${fmt(p.semaine)}</div>
+      <div style="text-align:right;font-size:11px;color:rgba(255,255,255,.38)">${fmt(p.prec)}</div>
+      <div style="text-align:right;font-size:11px;font-weight:700;color:${varColor}">${(p.var >= 0 ? '+' : '') + p.var.toFixed(2)}%</div>
+    </div>`;
+  }).join('');
+})();
+</script>
+
+
+
 <!-- NAV -->
 <nav id="nav">
   <div class="nav-logo">
@@ -279,6 +475,7 @@ footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:c
     </div>
   </div>
 </section>
+
 
 <!-- FOOTER -->
 <footer>

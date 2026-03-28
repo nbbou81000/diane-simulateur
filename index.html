@@ -441,8 +441,8 @@ tailwind.config = {
   from { opacity:0; transform:translateY(4px); }
   to   { opacity:1; transform:translateY(0); }
 }
-.spf-kpi { transition: background .3s ease; }
-.spf-kpi:hover { background: rgba(255,255,255,0.03); }
+.spf-row { transition: background .2s ease; }
+.spf-row:hover { background: rgba(255,255,255,0.025); }
 </style>
 </head>
 
@@ -548,15 +548,14 @@ tailwind.config = {
   </div>
 
   <!-- ═══════════════ VEILLE SANITAIRE SPF ═══════════════ -->
-  <div class="fade-up" style="transition-delay:310ms;width:100%;max-width:780px;margin:0 auto 44px auto;padding:0 12px">
+  <div class="fade-up" style="transition-delay:310ms;width:100%;max-width:780px;margin:0 auto 12px auto;padding:0 12px">
 
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,.35);text-align:center;letter-spacing:.07em;text-transform:uppercase;margin-bottom:16px;line-height:1.75">
       Le système de santé est sous tension permanente.<br>
       Données réelles des services d'urgence en France — réseau OSCOUR® · ~700 établissements
     </p>
 
-    <!-- Card dashboard -->
-    <div id="spf-card" style="position:relative;background:rgba(8,18,40,0.60);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(148,185,220,0.15);border-radius:16px;overflow:hidden;font-family:'JetBrains Mono',monospace;">
+    <div id="spf-card" style="position:relative;background:rgba(8,18,40,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(148,185,220,0.15);border-radius:16px;overflow:hidden;font-family:'JetBrains Mono',monospace;">
 
       <!-- Scan line -->
       <div style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-radius:16px">
@@ -575,7 +574,7 @@ tailwind.config = {
         </div>
       </div>
 
-      <!-- Sous-header : tension globale + date -->
+      <!-- Sous-header tension + date -->
       <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid rgba(148,185,220,0.07);background:rgba(0,0,0,0.10)">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3)">Tension réseau</span>
@@ -593,28 +592,33 @@ tailwind.config = {
       <div style="font-size:7.5px;color:rgba(255,255,255,.18);letter-spacing:.06em;text-align:right;padding:0 20px 6px;position:relative;z-index:1">pour 100 000 passages avec diagnostic · tous âges · France entière</div>
 
       <!-- Rows pathologies -->
-      <div id="spf-rows" style="position:relative;z-index:1">
-        <!-- Injecté par JS -->
-      </div>
+      <div id="spf-rows" style="position:relative;z-index:1"></div>
 
       <!-- Barre de progression globale -->
-      <div id="spf-bars" style="position:relative;z-index:1;padding:12px 20px 14px;border-top:1px solid rgba(148,185,220,0.07)">
-        <!-- Injecté par JS -->
-      </div>
+      <div id="spf-bars" style="position:relative;z-index:1;padding:12px 20px 14px;border-top:1px solid rgba(148,185,220,0.07)"></div>
 
-      <!-- Spinner chargement -->
+      <!-- Spinner -->
       <div id="spf-loading" style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,18,40,0.88);backdrop-filter:blur(4px);gap:10px;border-radius:16px">
         <div style="width:22px;height:22px;border-radius:50%;border:2px solid rgba(0,229,255,.15);border-top-color:#00e5ff;animation:spfSpin 0.8s linear infinite"></div>
         <span style="font-size:10px;letter-spacing:.12em;color:rgba(0,229,255,.5);text-transform:uppercase">Connexion réseau OSCOUR®…</span>
       </div>
 
-      <!-- Footer -->
+      <!-- Footer card -->
       <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:8px 20px;border-top:1px solid rgba(148,185,220,0.07);background:rgba(0,0,0,0.12)">
         <span id="spf-source" style="font-size:8.5px;color:rgba(255,255,255,.2);letter-spacing:.04em">Source : Santé Publique France · Odissé · data.gouv.fr</span>
         <a href="https://odisse.santepubliquefrance.fr" target="_blank" rel="noopener" style="font-size:8.5px;color:rgba(148,185,220,.35);letter-spacing:.04em;text-decoration:none">odisse.santepubliquefrance.fr ↗</a>
       </div>
 
     </div><!-- /spf-card -->
+
+    <!-- Bouton voir toutes les données -->
+    <div style="text-align:center;margin-top:14px">
+      <a href="encyclopedie.html#bulletin-oscour" style="display:inline-flex;align-items:center;gap:8px;padding:9px 20px;background:rgba(148,185,220,0.06);border:1px solid rgba(148,185,220,0.18);border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:rgba(148,185,220,.6);letter-spacing:.07em;text-decoration:none;text-transform:uppercase;transition:all .22s ease" onmouseover="this.style.background='rgba(148,185,220,0.12)';this.style.color='rgba(148,185,220,.9)';this.style.borderColor='rgba(148,185,220,0.35)'" onmouseout="this.style.background='rgba(148,185,220,0.06)';this.style.color='rgba(148,185,220,.6)';this.style.borderColor='rgba(148,185,220,0.18)'">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        Voir toutes les données · Bulletin OSCOUR® complet
+      </a>
+    </div>
+
   </div><!-- /veille sanitaire wrapper -->
   <!-- ════════════════════════════════════════════════════ -->
 
@@ -1413,16 +1417,6 @@ document.querySelectorAll('.glass').forEach(card => {
 
   const FUNCTION_URL = '/.netlify/functions/get-urgences';
 
-  /* ── Couleurs & icônes par pathologie ── */
-  const META = {
-    trauma:  { color: '#00e5ff', icon: '🦴', bar: 'rgba(0,229,255,0.7)' },
-    orl:     { color: '#a78bfa', icon: '👂', bar: 'rgba(167,139,250,0.7)' },
-    grippe:  { color: '#fbbf24', icon: '🌡', bar: 'rgba(251,191,36,0.7)' },
-    asthme:  { color: '#34d399', icon: '💨', bar: 'rgba(52,211,153,0.7)' },
-    covid:   { color: '#f87171', icon: '🔬', bar: 'rgba(248,113,113,0.7)' },
-  };
-
-  /* Fallback données réelles semaine 12-2026 */
   const FALLBACK = {
     ok: true,
     date: 'Sem. 12 — 2026',
@@ -1438,6 +1432,14 @@ document.querySelectorAll('.glass').forEach(card => {
     live: false,
   };
 
+  const META = {
+    trauma:  { color: '#00e5ff', icon: '🦴', bar: 'rgba(0,229,255,0.7)' },
+    orl:     { color: '#a78bfa', icon: '👂', bar: 'rgba(167,139,250,0.7)' },
+    grippe:  { color: '#fbbf24', icon: '🌡', bar: 'rgba(251,191,36,0.7)' },
+    asthme:  { color: '#34d399', icon: '💨', bar: 'rgba(52,211,153,0.7)' },
+    covid:   { color: '#f87171', icon: '🔬', bar: 'rgba(248,113,113,0.7)' },
+  };
+
   const el = id => document.getElementById(id);
 
   const withTimeout = (p, ms) => Promise.race([
@@ -1449,95 +1451,73 @@ document.querySelectorAll('.glass').forEach(card => {
     const l = el('spf-loading');
     if (!l) return;
     l.style.transition = 'opacity .4s ease';
-    l.style.opacity    = '0';
+    l.style.opacity = '0';
     setTimeout(() => l.parentNode && l.parentNode.removeChild(l), 420);
   }
 
   function fmt(n) {
-    if (n == null || isNaN(n)) return '—';
-    return Math.round(n).toLocaleString('fr-FR');
+    return (n != null && !isNaN(n)) ? Math.round(n).toLocaleString('fr-FR') : '—';
   }
 
   function renderRows(pathologies) {
     const container = el('spf-rows');
     if (!container) return;
-
-    /* Valeur max pour barres relatives */
     const maxP = Math.max(...pathologies.map(p => p.tauxPassage || 0));
-
-    const html = pathologies.map((p, i) => {
+    container.innerHTML = pathologies.map((p, i) => {
       const m   = META[p.key] || { color: '#aaa', icon: '📊', bar: 'rgba(170,170,170,0.6)' };
       const pct = maxP > 0 ? Math.round(((p.tauxPassage || 0) / maxP) * 100) : 0;
       const isLast = i === pathologies.length - 1;
-      const borderStyle = isLast ? '' : 'border-bottom:1px solid rgba(148,185,220,0.06)';
-
-      return `
-        <div class="spf-row" style="display:grid;grid-template-columns:1fr 130px 130px;align-items:center;padding:10px 20px;${borderStyle};transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.025)'" onmouseout="this.style.background='transparent'">
-          <div style="display:flex;align-items:center;gap:9px">
-            <span style="font-size:14px;line-height:1">${m.icon}</span>
-            <div>
-              <div style="font-size:10px;font-weight:700;color:${m.color};letter-spacing:.04em;margin-bottom:4px">${p.label}</div>
-              <div style="height:3px;width:${Math.min(pct, 100)}%;max-width:160px;background:${m.bar};border-radius:2px;transition:width .8s ease"></div>
-            </div>
+      return `<div class="spf-row" style="display:grid;grid-template-columns:1fr 130px 130px;align-items:center;padding:10px 20px;${isLast ? '' : 'border-bottom:1px solid rgba(148,185,220,0.06);'}">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="font-size:14px;line-height:1">${m.icon}</span>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:${m.color};letter-spacing:.04em;margin-bottom:4px">${p.label}</div>
+            <div style="height:3px;width:${Math.min(pct,100)}%;max-width:160px;background:${m.bar};border-radius:2px"></div>
           </div>
-          <div style="text-align:right">
-            <span style="font-size:14px;font-weight:700;color:${m.color};letter-spacing:-.01em">${fmt(p.tauxPassage)}</span>
-          </div>
-          <div style="text-align:right">
-            <span style="font-size:14px;font-weight:700;color:rgba(255,214,0,.85);letter-spacing:-.01em">${fmt(p.tauxHostit)}</span>
-          </div>
-        </div>`;
+        </div>
+        <div style="text-align:right;font-size:14px;font-weight:700;color:${m.color};letter-spacing:-.01em">${fmt(p.tauxPassage)}</div>
+        <div style="text-align:right;font-size:14px;font-weight:700;color:rgba(255,214,0,.85);letter-spacing:-.01em">${fmt(p.tauxHostit)}</div>
+      </div>`;
     }).join('');
-
-    container.innerHTML = html;
   }
 
   function renderBars(pathologies) {
     const container = el('spf-bars');
     if (!container) return;
-
-    /* Jauge visuelle comparative */
     const maxP = Math.max(...pathologies.map(p => p.tauxPassage || 0));
-    const bars = pathologies.map(p => {
-      const m   = META[p.key] || { color: '#aaa', bar: 'rgba(170,170,170,0.6)' };
-      const pct = maxP > 0 ? ((p.tauxPassage || 0) / maxP * 100).toFixed(1) : 0;
-      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-        <span style="font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.06em;width:90px;text-align:right;text-transform:uppercase;flex-shrink:0">${p.label.split('/')[0].trim().slice(0,12)}</span>
-        <div style="flex:1;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden">
-          <div style="height:100%;width:${pct}%;background:${m.bar};border-radius:2px;transition:width 1s ease"></div>
-        </div>
-        <span style="font-size:8px;color:rgba(255,255,255,.2);width:28px;text-align:right">${pct}%</span>
-      </div>`;
-    }).join('');
-
-    container.innerHTML = `
-      <div style="font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:8px">Répartition relative · passages / 100k</div>
-      ${bars}`;
+    container.innerHTML = `<div style="font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:8px">Répartition relative · passages / 100k</div>` +
+      pathologies.map(p => {
+        const m   = META[p.key] || { color: '#aaa', bar: 'rgba(170,170,170,0.6)' };
+        const pct = maxP > 0 ? ((p.tauxPassage || 0) / maxP * 100).toFixed(1) : 0;
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:8px;color:rgba(255,255,255,.3);width:90px;text-align:right;text-transform:uppercase;flex-shrink:0">${p.label.split('/')[0].trim().slice(0,12)}</span>
+          <div style="flex:1;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${m.bar};border-radius:2px"></div>
+          </div>
+          <span style="font-size:8px;color:rgba(255,255,255,.2);width:28px;text-align:right">${pct}%</span>
+        </div>`;
+      }).join('');
   }
 
   function renderData(d) {
     hideLoading();
 
-    /* Tension */
     const te = el('spf-tension');
     if (te && d.tension) {
-      te.textContent      = d.tension.label;
-      te.style.color      = d.tension.color;
+      te.textContent = d.tension.label;
+      te.style.color = d.tension.color;
       te.style.textShadow = `0 0 10px ${d.tension.color}99`;
-      te.style.animation  = 'spfFadeIn .5s ease both';
+      te.style.animation = 'spfFadeIn .5s ease both';
     }
 
-    /* Date */
     const de = el('spf-date');
     if (de) de.textContent = 'Mise à jour : ' + (d.date || '—');
 
-    /* Source */
     const se = el('spf-source');
     if (se) se.textContent = d.live
       ? (d.source || 'SPF Odissé · OSCOUR® · SurSaUD®')
       : 'SPF OSCOUR® · Mode Hors-ligne / Données Estimées';
 
-    /* Pastille */
     const dot = el('spf-dot');
     const lbl = dot?.nextElementSibling;
     if (!d.live) {
@@ -1545,7 +1525,6 @@ document.querySelectorAll('.glass').forEach(card => {
       if (lbl) { lbl.textContent = 'Mode Hors-ligne / Données Estimées'; lbl.style.color = 'rgba(255,152,0,.7)'; }
     }
 
-    /* Rows + Bars */
     if (d.pathologies?.length) {
       renderRows(d.pathologies);
       renderBars(d.pathologies);
@@ -1554,7 +1533,7 @@ document.querySelectorAll('.glass').forEach(card => {
 
   async function init() {
     try {
-      const res  = await withTimeout(fetch(FUNCTION_URL), 14000);
+      const res = await withTimeout(fetch(FUNCTION_URL), 14000);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || 'Erreur fonction');
@@ -1570,6 +1549,7 @@ document.querySelectorAll('.glass').forEach(card => {
     : init();
 })();
 </script>
+
 
 </body>
 </html>
