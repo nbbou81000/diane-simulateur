@@ -1,7 +1,7 @@
 /**
- * get-urgences.js — v5 DIAGNOSTIC
- * Dump complet de la réponse Odissé sans aucun filtre
- * pour identifier les vrais noms de champs côté serveur.
+ * get-urgences.js — v7 EXPLORATION CATALOGUE
+ * Cherche les datasets Odissé contenant des données
+ * de passages aux urgences toutes causes.
  */
 const https = require('https');
 
@@ -14,63 +14,68 @@ const CORS = {
 function httpsGet(url) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
-      headers: { 'User-Agent': 'DIANE-Simulateur/5.0', 'Accept': 'application/json' },
+      headers: { 'User-Agent': 'DIANE-Simulateur/7.0', 'Accept': 'application/json' },
     }, (res) => {
       let data = '';
       res.on('data', c => data += c);
-      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: data }));
+      res.on('end', () => resolve({ status: res.statusCode, body: data }));
     });
     req.on('error', reject);
-    req.setTimeout(12000, () => { req.destroy(); reject(new Error('Timeout 12s')); });
+    req.setTimeout(12000, () => { req.destroy(); reject(new Error('Timeout')); });
   });
 }
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: CORS, body: '' };
 
-  const dataset = event.queryStringParameters?.ds
-    || 'covid-19-passages-aux-urgences-et-actes-sos-medecins-france';
+  const mode = event.queryStringParameters?.mode || 'catalogue';
 
-  const where  = event.queryStringParameters?.where  || '';
-  const select = event.queryStringParameters?.select || '*';
-  const order  = event.queryStringParameters?.order  || 'semaine desc';
-  const limit  = event.queryStringParameters?.limit  || '3';
-
-  const qs = new URLSearchParams({ limit, order_by: order, select });
-  if (where) qs.set('where', where);
-
-  const url = `https://odisse.santepubliquefrance.fr/api/explore/v2.1/catalog/datasets/${dataset}/records?${qs}`;
-
-  try {
-    const r = await httpsGet(url);
-    let parsed = null;
-    let parseErr = null;
-    try { parsed = JSON.parse(r.body); } catch(e) { parseErr = e.message; }
-
-    const results  = parsed?.results || [];
-    const firstRow = results[0] || null;
-    const fields   = firstRow ? Object.keys(firstRow) : [];
-
-    return {
-      statusCode: 200,
-      headers: CORS,
-      body: JSON.stringify({
-        _diag: true,
-        url_called:  url,
-        http_status: r.status,
-        total_count: parsed?.total_count ?? null,
-        nb_results:  results.length,
-        fields_found: fields,
-        first_record: firstRow,
-        parse_error:  parseErr,
-        raw_body_preview: r.body.slice(0, 800),
-      }, null, 2),
-    };
-  } catch (err) {
-    return {
-      statusCode: 200,
-      headers: CORS,
-      body: JSON.stringify({ _diag: true, error: err.message, url_called: url }),
-    };
+  /* ── Mode 1 : recherche dans le catalogue ── */
+  if (mode === 'catalogue') {
+    const searches = [
+      'toutes+causes+urgences',
+      'passages+urgences+france',
+      'activite+urgences',
+      'sursaud+passages',
+    ];
+    const results = {};
+    for (const q of searches) {
+      const url = `https://odisse.santepubliquefrance.fr/api/explore/v2.1/catalog/datasets?limit=5&search=${q}&select=dataset_id,metas.title,metas.modified`;
+      try {
+        const r = await httpsGet(url);
+        const j = JSON.parse(r.body);
+        results[q] = (j.datasets || j.results || []).map(d => ({
+          id:       d.dataset_id || d.datasetid,
+          title:    d.metas?.title || d.dataset?.metas?.title,
+          modified: d.metas?.modified || d.dataset?.metas?.modified,
+        }));
+      } catch(e) {
+        results[q] = { error: e.message };
+      }
+    }
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({ mode, results }, null, 2) };
   }
+
+  /* ── Mode 2 : inspecter un dataset précis ── */
+  if (mode === 'inspect') {
+    const ds = event.queryStringParameters?.ds || '';
+    if (!ds) return { statusCode: 200, headers: CORS, body: JSON.stringify({ error: 'Paramètre ds manquant' }) };
+    const url = `https://odisse.santepubliquefrance.fr/api/explore/v2.1/catalog/datasets/${ds}/records?limit=2&order_by=date_complet+desc,semaine+desc`;
+    try {
+      const r = await httpsGet(url);
+      const j = JSON.parse(r.body);
+      const first = (j.results || [])[0] || null;
+      return { statusCode: 200, headers: CORS, body: JSON.stringify({
+        mode, dataset: ds,
+        total_count: j.total_count,
+        fields: first ? Object.keys(first) : [],
+        first_record: first,
+        second_record: (j.results || [])[1] || null,
+      }, null, 2) };
+    } catch(e) {
+      return { statusCode: 200, headers: CORS, body: JSON.stringify({ error: e.message }) };
+    }
+  }
+
+  return { statusCode: 200, headers: CORS, body: JSON.stringify({ error: 'mode inconnu — utilise ?mode=catalogue ou ?mode=inspect&ds=DATASET_ID' }) };
 };
