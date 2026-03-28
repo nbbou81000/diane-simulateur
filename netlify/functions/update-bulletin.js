@@ -1,12 +1,16 @@
 /**
  * update-bulletin.js — Netlify Scheduled Function
  * Cron : mercredi 16h00 UTC, retry jeudi 10h UTC
+ *
+ * Stratégie : construction directe de l'URL du PDF par date
+ * Pattern SPF : bullnat_oscour_YYYYMMDD.pdf
+ * Publié le mardi ou mercredi suivant la semaine de référence
  */
 
 const https = require('https');
 const { getStore } = require('@netlify/blobs');
 
-/* ── HTTP GET avec suivi redirections ── */
+/* ── HTTP GET avec redirections ── */
 function httpsGet(url, binary = false) {
   return new Promise((resolve, reject) => {
     try {
@@ -17,16 +21,16 @@ function httpsGet(url, binary = false) {
         },
       }, (res) => {
         if ([301,302,303,307,308].includes(res.statusCode) && res.headers.location) {
-          const redirectUrl = res.headers.location.startsWith('http')
+          const next = res.headers.location.startsWith('http')
             ? res.headers.location
             : 'https://www.santepubliquefrance.fr' + res.headers.location;
-          return httpsGet(redirectUrl, binary).then(resolve).catch(reject);
+          return httpsGet(next, binary).then(resolve).catch(reject);
         }
         const chunks = [];
         res.on('data', c => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
         res.on('end', () => resolve({
           status: res.statusCode,
-          body: binary ? Buffer.concat(chunks) : Buffer.concat(chunks).toString('utf-8'),
+          body:   binary ? Buffer.concat(chunks) : Buffer.concat(chunks).toString('utf-8'),
         }));
       });
       req.on('error', reject);
@@ -41,16 +45,12 @@ function httpsPost(url, bodyObj) {
     try {
       const bodyStr = JSON.stringify(bodyObj);
       const parsed  = new URL(url);
-      const options = {
+      const req = https.request({
         hostname: parsed.hostname,
         path:     parsed.pathname + parsed.search,
         method:   'POST',
-        headers:  {
-          'Content-Type':   'application/json',
-          'Content-Length': Buffer.byteLength(bodyStr),
-        },
-      };
-      const req = https.request(options, (res) => {
+        headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(bodyStr) },
+      }, (res) => {
         const chunks = [];
         res.on('data', c => chunks.push(c));
         res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString('utf-8') }));
@@ -63,50 +63,122 @@ function httpsPost(url, bodyObj) {
   });
 }
 
-/* ── Trouver l'URL directe du dernier PDF OSCOUR ── */
-async function findPdfUrl() {
+/* ── Formater une date en YYYYMMDD ── */
+function dateToStr(d) {
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}${m}${day}`;
+}
+
+/* ── Générer les dates candidates à tester ── */
+function getCandidateDates() {
+  const now = new Date();
+  const candidates = [];
+
+  /* Tester les 14 derniers jours (mardi et mercredi de chaque semaine) */
+  for (let i = 0; i <= 14; i++) {
+    const d = new Date(now);
+    d.setUTCDate(now.getUTCDate() - i);
+    const dow = d.getUTCDay(); // 0=dim, 1=lun, 2=mar, 3=mer
+    if (dow === 2 || dow === 3) { // mardi ou mercredi
+      candidates.push(dateToStr(d));
+    }
+  }
+  return candidates;
+}
+
+/* ── Trouver le dernier PDF disponible par force brute sur les dates ── */
+async function findLatestPdf() {
   const BASE = 'https://www.santepubliquefrance.fr';
 
-  /* Étape 1 : page principale OSCOUR */
-  const mainPage = await httpsGet(BASE + '/surveillance-syndromique-sursaud-R/reseau-oscour-R-organisation-de-la-surveillance-coordonnee-des-urgences');
-  console.log('[update-bulletin] Page SPF status:', mainPage.status, '— taille:', mainPage.body.length, 'chars');
+  /* URLs candidates construites à partir des dates récentes */
+  const dates = getCandidateDates();
+  console.log('[update-bulletin] Dates candidates:', dates.join(', '));
 
-  /* Chercher PDF directement */
-  const directPdf = [...mainPage.body.matchAll(/href="([^"]*bullnat[^"]*\.pdf)"/gi)];
-  if (directPdf.length) {
-    const raw = directPdf[0][1];
+  /* Patterns d'URL connus pour les bulletins OSCOUR SPF */
+  const patterns = [
+    d => `${BASE}/content/download/bullnat_oscour_${d}.pdf`,
+    d => `${BASE}/import/media/docs/bullnat_oscour_${d}.pdf`,
+    d => `${BASE}/ftp/upload/published-report/doc/bullnat_oscour_${d}.pdf`,
+    d => `${BASE}/surveillance-syndromique-sursaud-R/documents/bulletin-national/${d.slice(0,4)}/bulletin-national-d-information-oscour-du-${formatDateFr(d)}`,
+  ];
+
+  for (const date of dates) {
+    for (const makeUrl of patterns) {
+      const url = makeUrl(date);
+      try {
+        console.log('[update-bulletin] Test:', url);
+        /* HEAD request pour vérifier existence sans télécharger */
+        const check = await new Promise((resolve, reject) => {
+          const parsed = new URL(url);
+          const req = https.request({
+            hostname: parsed.hostname,
+            path: parsed.pathname,
+            method: 'HEAD',
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DIANE-Simulateur/1.0)' },
+          }, res => {
+            resolve({ status: res.statusCode, location: res.headers.location });
+          });
+          req.on('error', reject);
+          req.setTimeout(8000, () => { req.destroy(); reject(new Error('timeout')); });
+          req.end();
+        });
+
+        if (check.status === 200) {
+          console.log('[update-bulletin] ✅ PDF trouvé:', url);
+          return url;
+        }
+        if ([301,302].includes(check.status) && check.location) {
+          const finalUrl = check.location.startsWith('http') ? check.location : BASE + check.location;
+          if (finalUrl.endsWith('.pdf')) {
+            console.log('[update-bulletin] ✅ PDF via redirect:', finalUrl);
+            return finalUrl;
+          }
+        }
+      } catch(_) { /* continuer */ }
+    }
+  }
+
+  /* Fallback : scraping de la page de liste des bulletins */
+  return await scrapeBulletinPage();
+}
+
+/* ── Formatter date YYYYMMDD en format français pour URL ── */
+function formatDateFr(dateStr) {
+  const months = ['janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre'];
+  const y = dateStr.slice(0,4), m = parseInt(dateStr.slice(4,6))-1, d = parseInt(dateStr.slice(6,8));
+  return `${d}-${months[m]}-${y}`;
+}
+
+/* ── Scraping page bulletins (fallback) ── */
+async function scrapeBulletinPage() {
+  const BASE = 'https://www.santepubliquefrance.fr';
+  const listUrl = BASE + '/surveillance-syndromique-sursaud-R/documents/bulletin-national';
+
+  console.log('[update-bulletin] Scraping page liste:', listUrl);
+  const page = await httpsGet(listUrl);
+  console.log('[update-bulletin] Status:', page.status, '— taille:', page.body.length);
+
+  /* Chercher tous les liens PDF dans la page */
+  const allPdfs = [...page.body.matchAll(/href="([^"]*bullnat[^"]*(?:\.pdf|bulletin[^"]*))"/gi)];
+  if (allPdfs.length) {
+    const raw = allPdfs[0][1];
     const url = raw.startsWith('http') ? raw : BASE + raw;
-    console.log('[update-bulletin] PDF direct trouvé:', url);
+    console.log('[update-bulletin] PDF via scraping:', url);
     return url;
   }
 
-  /* Chercher lien vers page bulletin */
-  const bulletinLinks = [...mainPage.body.matchAll(/href="([^"]*bulletin[^"]*oscour[^"]*)"/gi)];
-  console.log('[update-bulletin] Liens bulletin trouvés:', bulletinLinks.length);
-
-  if (!bulletinLinks.length) {
-    /* Chercher n'importe quel PDF SPF lié à OSCOUR */
-    const anyPdf = [...mainPage.body.matchAll(/href="([^"]*oscour[^"]*\.pdf[^"]*)"/gi)];
-    if (anyPdf.length) {
-      const raw = anyPdf[0][1];
-      return raw.startsWith('http') ? raw : BASE + raw;
-    }
-    throw new Error('Aucun lien bulletin ni PDF trouvé sur la page SPF OSCOUR');
+  /* Dernier recours : page principale OSCOUR */
+  const mainUrl = BASE + '/surveillance-syndromique-sursaud-R/reseau-oscour-R-organisation-de-la-surveillance-coordonnee-des-urgences';
+  const main = await httpsGet(mainUrl);
+  const pdfs = [...main.body.matchAll(/href="([^"]*\.pdf)"/gi)];
+  if (pdfs.length) {
+    const raw = pdfs[0][1];
+    return raw.startsWith('http') ? raw : BASE + raw;
   }
 
-  /* Charger la page intermédiaire du bulletin */
-  const raw0 = bulletinLinks[0][1];
-  const bulletinPageUrl = raw0.startsWith('http') ? raw0 : BASE + raw0;
-  console.log('[update-bulletin] Page bulletin intermédiaire:', bulletinPageUrl);
-
-  const bulletinPage = await httpsGet(bulletinPageUrl);
-  const pdfs = [...bulletinPage.body.matchAll(/href="([^"]*\.pdf[^"]*)"/gi)];
-  console.log('[update-bulletin] PDFs trouvés sur page bulletin:', pdfs.length);
-
-  if (!pdfs.length) throw new Error('Aucun PDF sur la page du bulletin: ' + bulletinPageUrl);
-
-  const rawPdf = pdfs[0][1];
-  return rawPdf.startsWith('http') ? rawPdf : BASE + rawPdf;
+  throw new Error('Impossible de trouver le bulletin PDF sur le site SPF');
 }
 
 /* ── Extraction via Google Gemini ── */
@@ -132,11 +204,20 @@ Retourne UNIQUEMENT un JSON brut valide (sans markdown, sans texte avant/après)
   "hospit_75plus": 28035,
   "hospit_evol_total": 3.02,
   "top10": [
-    {"rang":1,"label":"Traumatisme","semaine":99623,"prec":91728,"var":8.61}
+    {"rang":1,"label":"Traumatisme","semaine":99623,"prec":91728,"var":8.61},
+    {"rang":2,"label":"Douleurs abdominales non spécifiques","semaine":18245,"prec":18158,"var":0.48},
+    {"rang":3,"label":"Douleur thoracique","semaine":13628,"prec":13310,"var":2.39},
+    {"rang":4,"label":"Malaise","semaine":12896,"prec":12574,"var":2.56},
+    {"rang":5,"label":"Infections ORL","semaine":11315,"prec":10097,"var":12.06},
+    {"rang":6,"label":"Neurologie autre","semaine":10612,"prec":10365,"var":2.38},
+    {"rang":7,"label":"Douleurs abdominales spécifiques","semaine":10036,"prec":10055,"var":-0.19},
+    {"rang":8,"label":"Infection cutanée / sous-cutanée","semaine":6071,"prec":5832,"var":4.10},
+    {"rang":9,"label":"Infection urinaire","semaine":5602,"prec":5293,"var":5.84},
+    {"rang":10,"label":"Pneumopathie","semaine":4870,"prec":4862,"var":0.16}
   ],
   "points_cles": ["phrase 1","phrase 2","phrase 3","phrase 4"]
 }
-Si une valeur est absente du bulletin, mets null. JSON uniquement.`;
+Extrais les vraies valeurs du PDF. JSON uniquement, pas de markdown.`;
 
   const body = {
     contents: [{ parts: [
@@ -146,9 +227,8 @@ Si une valeur est absente du bulletin, mets null. JSON uniquement.`;
     generationConfig: { temperature: 0.1, maxOutputTokens: 2048 },
   };
 
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-  const res = await httpsPost(geminiUrl, body);
-
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const res = await httpsPost(url, body);
   if (res.status !== 200) throw new Error(`Gemini HTTP ${res.status}: ${res.body.slice(0,300)}`);
 
   const json  = JSON.parse(res.body);
@@ -157,32 +237,26 @@ Si une valeur est absente du bulletin, mets null. JSON uniquement.`;
   return JSON.parse(clean);
 }
 
-/* ── Handler principal ── */
+/* ── Handler ── */
 exports.handler = async function () {
   console.log('[update-bulletin] Démarrage —', new Date().toISOString());
-
   try {
-    /* 1. Trouver le PDF */
-    const pdfUrl = await findPdfUrl();
-    console.log('[update-bulletin] PDF URL finale:', pdfUrl);
+    const pdfUrl = await findLatestPdf();
+    console.log('[update-bulletin] PDF:', pdfUrl);
 
-    /* 2. Télécharger */
     const pdf = await httpsGet(pdfUrl, true);
     if (pdf.status !== 200) throw new Error(`PDF download HTTP ${pdf.status}`);
-    console.log(`[update-bulletin] PDF téléchargé: ${Math.round(pdf.body.length / 1024)} Ko`);
+    console.log(`[update-bulletin] PDF OK (${Math.round(pdf.body.length / 1024)} Ko)`);
 
-    /* 3. Extraire via Gemini */
     const data = await extractWithGemini(pdf.body.toString('base64'));
-    console.log('[update-bulletin] Extrait:', data.semaine, '— passages:', data.passages_total);
+    console.log('[update-bulletin] Extrait:', data.semaine);
 
-    /* 4. Stocker */
     const store = getStore('oscour-bulletin');
     await store.set('latest', JSON.stringify({ ...data, pdf_url: pdfUrl, updated_at: new Date().toISOString() }));
     console.log('[update-bulletin] ✅ Stocké');
 
     return { statusCode: 200, body: JSON.stringify({ ok: true, semaine: data.semaine }) };
-
-  } catch (err) {
+  } catch(err) {
     console.error('[update-bulletin] ❌', err.message);
     return { statusCode: 200, body: JSON.stringify({ ok: false, error: err.message }) };
   }
