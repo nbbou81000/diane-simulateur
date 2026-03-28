@@ -227,7 +227,7 @@ Extrais les vraies valeurs du PDF. JSON uniquement, pas de markdown.`;
     generationConfig: { temperature: 0.1, maxOutputTokens: 2048 },
   };
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${apiKey}`;
   const res = await httpsPost(url, body);
   if (res.status !== 200) throw new Error(`Gemini HTTP ${res.status}: ${res.body.slice(0,300)}`);
 
