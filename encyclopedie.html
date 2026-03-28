@@ -290,21 +290,20 @@ footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:c
 <script>
 (function () {
 
-  /* ── Données S12-2026 — fallback si le cron n'a pas encore tourné ── */
   const FALLBACK = {
     semaine: 'S12 — 2026',
     periode: '16 au 22 mars 2026',
     numero: '1093',
     date_publication: '24.03.2026',
-    passages_total: 361245,
+    passages_total:   361245,
     passages_moins15: 83030,
-    passages_15_74: 220797,
-    passages_75plus: 57418,
-    hospit_total: 79125,
-    hospit_moins2: 3193,
-    hospit_2_14: 5629,
-    hospit_15_74: 42265,
-    hospit_75plus: 28035,
+    passages_15_74:   220797,
+    passages_75plus:  57418,
+    hospit_total:   79125,
+    hospit_moins2:   3193,
+    hospit_2_14:     5629,
+    hospit_15_74:   42265,
+    hospit_75plus:  28035,
     hospit_evol_total: 3.02,
     top10: [
       { rang:1,  label:'Traumatisme',                          semaine:99623, prec:91728, var:8.61  },
@@ -319,119 +318,113 @@ footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:c
       { rang:10, label:'Pneumopathie',                         semaine:4870,  prec:4862,  var:0.16  },
     ],
     points_cles: [
-      'Passages en hausse chez les enfants +10% (+8 046 passages) · hospitalisations <2 ans +6%',
-      'Infections ORL en progression dans toutes les classes d'âge +12% (+1 218 passages)',
-      'Fièvre isolée tous âges +17% · Traumatismes adultes +7% · 2-14 ans +13%',
-      '≥ 75 ans : douleur thoracique +9% · AVC +7%',
+      "Passages en hausse chez les enfants +10% (+8 046 passages) · hospitalisations <2 ans +6%",
+      "Infections ORL en progression dans toutes les classes d'âge +12% (+1 218 passages)",
+      "Fièvre isolée tous âges +17% · Traumatismes adultes +7% · 2-14 ans +13%",
+      "≥ 75 ans : douleur thoracique +9% · AVC +7%",
     ],
   };
 
   const COLORS = ['#00e5ff','#a78bfa','#f87171','#fbbf24','#34d399','#7eb8d4','#a78bfa','#fbbf24','#34d399','#7eb8d4'];
   const fmt = n => (n != null) ? Math.round(n).toLocaleString('fr-FR') : '—';
-  const pct = n => (n != null) ? (n >= 0 ? '+' : '') + Number(n).toFixed(2) + '%' : '—';
+  const pctStr = n => (n != null) ? (n >= 0 ? '+' : '') + Number(n).toFixed(2) + '%' : '—';
 
-  function applyData(d) {
-    /* ── Titre ── */
-    const subtitle = document.querySelector('#bulletin-oscour p[style*="color:rgba(255,255,255,.38)"]');
-    if (subtitle) subtitle.textContent = `SurSaUD® · Point hebdomadaire n°${d.numero || '—'} · Semaine ${d.periode || '—'}`;
-
-    const badge = document.querySelector('#oscour-card [style*="S12"]');
-    if (badge) badge.textContent = d.semaine || '—';
-
-    /* ── KPI principaux ── */
-    const kpis = document.querySelectorAll('#oscour-card [style*="font-size:24px"]');
-    const vals = [
-      d.passages_total   ? fmt(d.passages_total)   : '—',
-      d.hospit_total     ? fmt(d.hospit_total)      : '—',
-      d.passages_total && d.hospit_total ? (d.hospit_total / d.passages_total * 100).toFixed(1) + '%' : '—',
-    ];
-    // 4e KPI = évolution enfants : calculer si on a les données semaine précédente
-    kpis.forEach((el, i) => { if (vals[i] !== undefined) el.innerHTML = vals[i]; });
-
-    /* ── Passages par classe d'âge ── */
-    const ageVals = document.querySelectorAll('#oscour-card [style*="font-size:18px"]');
-    const ageData = [d.passages_moins15, d.passages_15_74, d.passages_75plus];
-    const total = (d.passages_moins15||0) + (d.passages_15_74||0) + (d.passages_75plus||0);
-    ageVals.forEach((el, i) => {
-      if (ageData[i] != null) el.textContent = fmt(ageData[i]);
-    });
-    /* Barres proportionnelles */
-    const bars = document.querySelectorAll('#oscour-card [style*="height:3px"]');
-    const agePct = ageData.map(v => total > 0 ? Math.round((v||0) / total * 100) : 0);
-    bars.forEach((el, i) => {
-      const inner = el.querySelector('div');
-      if (inner && agePct[i] !== undefined) inner.style.width = agePct[i] + '%';
-    });
-
-    /* ── Hospit par classe d'âge ── */
-    const hospitVals = document.querySelectorAll('#oscour-card [style*="font-size:15px"]');
-    const hospData = [d.hospit_moins2, d.hospit_2_14, d.hospit_15_74, d.hospit_75plus];
-    hospitVals.forEach((el, i) => {
-      if (hospData[i] != null) el.textContent = fmt(hospData[i]);
-    });
-
-    /* ── Tableau top 10 ── */
-    if (d.top10?.length) {
-      const maxP = Math.max(...d.top10.map(p => p.semaine || 0));
-      document.getElementById('oscour-rows').innerHTML = d.top10.map((p, i) => {
-        const color    = COLORS[i] || '#aaa';
-        const varColor = p.var > 5 ? '#fbbf24' : p.var > 0 ? '#4caf50' : '#f87171';
-        const barPct   = maxP > 0 ? ((p.semaine / maxP) * 100).toFixed(1) : 0;
-        return `<div style="display:grid;grid-template-columns:1fr 100px 100px 80px;align-items:center;padding:9px 22px;${i < d.top10.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.04);' : ''}transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.025)'" onmouseout="this.style.background='transparent'">
-          <div>
-            <div style="font-size:10.5px;font-weight:700;color:${color};margin-bottom:4px">${p.label}</div>
-            <div style="height:2px;width:${barPct}%;max-width:260px;background:${color}55;border-radius:1px"></div>
-          </div>
-          <div style="text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.85)">${fmt(p.semaine)}</div>
-          <div style="text-align:right;font-size:11px;color:rgba(255,255,255,.38)">${fmt(p.prec)}</div>
-          <div style="text-align:right;font-size:11px;font-weight:700;color:${varColor}">${pct(p.var)}</div>
-        </div>`;
-      }).join('');
-    }
-
-    /* ── Points clés ── */
-    if (d.points_cles?.length) {
-      const ptContainer = document.querySelector('#oscour-card [style*="flex-direction:column;gap:7px"]');
-      if (ptContainer) {
-        ptContainer.innerHTML = d.points_cles.map(pt =>
-          `<div style="display:flex;gap:10px;align-items:flex-start">
-            <span style="color:#fbbf24;flex-shrink:0;margin-top:1px">▲</span>
-            <span style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6">${pt}</span>
-          </div>`
-        ).join('');
-      }
-    }
-
-    /* ── Footer date ── */
-    const footer = document.querySelector('#oscour-card [style*="font-size:8.5px;color:rgba(255,255,255,.2)"]');
-    if (footer && d.date_publication) {
-      footer.textContent = `Source : Santé Publique France · Bulletin OSCOUR® n°${d.numero} · ${d.date_publication}`;
-    }
+  /* ── Rendu top10 — fonction indépendante et robuste ── */
+  function renderTop10(top10) {
+    const el = document.getElementById('oscour-rows');
+    if (!el || !top10 || !top10.length) return;
+    const maxP = Math.max(...top10.map(p => p.semaine || 0));
+    el.innerHTML = top10.map((p, i) => {
+      const color    = COLORS[i] || '#aaa';
+      const varColor = p.var > 5 ? '#fbbf24' : p.var > 0 ? '#4caf50' : '#f87171';
+      const barPct   = maxP > 0 ? ((p.semaine / maxP) * 100).toFixed(1) : 0;
+      const border   = i < top10.length - 1 ? 'border-bottom:1px solid rgba(255,255,255,0.04);' : '';
+      return `<div style="display:grid;grid-template-columns:1fr 100px 100px 80px;align-items:center;padding:9px 22px;${border}transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.025)'" onmouseout="this.style.background='transparent'">
+        <div>
+          <div style="font-size:10.5px;font-weight:700;color:${color};margin-bottom:4px">${p.label}</div>
+          <div style="height:2px;width:${barPct}%;max-width:260px;background:${color}55;border-radius:1px"></div>
+        </div>
+        <div style="text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.85)">${fmt(p.semaine)}</div>
+        <div style="text-align:right;font-size:11px;color:rgba(255,255,255,.38)">${fmt(p.prec)}</div>
+        <div style="text-align:right;font-size:11px;font-weight:700;color:${varColor}">${pctStr(p.var)}</div>
+      </div>`;
+    }).join('');
   }
 
-  /* ── Fetch depuis la Netlify Function ── */
+  /* ── Rendu points clés ── */
+  function renderPointsCles(points) {
+    const el = document.querySelector('#oscour-card [style*="flex-direction:column;gap:7px"]');
+    if (!el || !points || !points.length) return;
+    el.innerHTML = points.map(pt =>
+      `<div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="color:#fbbf24;flex-shrink:0;margin-top:1px">▲</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6">${pt}</span>
+      </div>`
+    ).join('');
+  }
+
+  /* ── Mise à jour des KPI texte (non critique) ── */
+  function updateKpis(d) {
+    try {
+      /* Grands chiffres KPI */
+      const kpis = document.querySelectorAll('#oscour-card [style*="font-size:24px"]');
+      if (kpis[0]) kpis[0].innerHTML = fmt(d.passages_total);
+      if (kpis[1]) kpis[1].innerHTML = fmt(d.hospit_total);
+      if (kpis[2] && d.passages_total && d.hospit_total)
+        kpis[2].innerHTML = (d.hospit_total / d.passages_total * 100).toFixed(1) + '<span style="font-size:14px">%</span>';
+
+      /* Passages par âge */
+      const ageVals = document.querySelectorAll('#oscour-card [style*="font-size:18px"]');
+      [d.passages_moins15, d.passages_15_74, d.passages_75plus].forEach((v, i) => {
+        if (ageVals[i] && v != null) ageVals[i].textContent = fmt(v);
+      });
+
+      /* Hospit par âge */
+      const hospVals = document.querySelectorAll('#oscour-card [style*="font-size:15px"]');
+      [d.hospit_moins2, d.hospit_2_14, d.hospit_15_74, d.hospit_75plus].forEach((v, i) => {
+        if (hospVals[i] && v != null) hospVals[i].textContent = fmt(v);
+      });
+
+      /* Footer date */
+      const footer = document.querySelector('#oscour-card [style*="font-size:8.5px;color:rgba(255,255,255,.2)"]');
+      if (footer && d.date_publication)
+        footer.textContent = `Source : Santé Publique France · Bulletin OSCOUR® n°${d.numero} · ${d.date_publication}`;
+
+      /* Badge semaine */
+      const badge = document.querySelector('#oscour-card [style*="animation:oscBlink"]');
+      if (badge && badge.nextElementSibling && d.semaine)
+        badge.nextElementSibling.textContent = d.semaine;
+
+    } catch(e) { console.warn('[bulletin] updateKpis:', e.message); }
+  }
+
+  /* ── Fetch bulletin live depuis Netlify Blobs ── */
   async function loadBulletin() {
     try {
       const res  = await fetch('/.netlify/functions/get-bulletin');
       const json = await res.json();
-      if (json.ok) {
-        applyData(json);
-        /* Badge "données live" */
-        const badge = document.querySelector('#oscour-card [style*="animation:oscBlink"]');
-        if (badge) {
-          badge.nextElementSibling && (badge.nextElementSibling.textContent = json.semaine || 'Live');
-        }
-      } else {
-        applyData(FALLBACK);
+      if (json.ok && json.top10?.length) {
+        renderTop10(json.top10);
+        renderPointsCles(json.points_cles);
+        updateKpis(json);
       }
-    } catch (_) {
-      applyData(FALLBACK);
+    } catch(e) {
+      console.warn('[bulletin] Fallback conservé :', e.message);
     }
   }
 
-  /* Appliquer le fallback immédiatement, puis tenter le live */
-  applyData(FALLBACK);
-  loadBulletin();
+  /* ── Init : fallback immédiat puis tentative live ── */
+  function init() {
+    renderTop10(FALLBACK.top10);
+    renderPointsCles(FALLBACK.points_cles);
+    updateKpis(FALLBACK);
+    loadBulletin();
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+
 })();
 </script>
 
