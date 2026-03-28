@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Encyclopédie Médicale — DIANE Simulateur</title>
+<meta name="description" content="Encyclopédie médicale haute-fidélité : termes de réanimation, soins intensifs, SMUR, métiers hospitaliers et système de santé français.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060810;--surface:rgba(255,255,255,.035);--border:rgba(255,255,255,.075);
+  --c-ecg:#6fcf97;--c-pleth:#7eb8d4;--c-capno:#c8be8a;--c-pa:#b093c8;
+  --c-fr:#8ba4c8;--c-temp:#c8a47a;--c-alarm:#c87878;--c-amb:#c8b870;
+  --text:rgba(255,255,255,.88);--dim:rgba(255,255,255,.4);
+  --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);font-family:'Syne',sans-serif;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(148,163,184,.18);border-radius:2px}
+
+/* ── Typo ── */
+.mono{font-family:'JetBrains Mono',monospace}
+.grad{background:linear-gradient(135deg,#94a3b8 0%,#e2e8f0 45%,#7aa3c8 100%);background-size:220%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 6s ease infinite}
+
+/* ── Layers ── */
+#bg-layer{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--bg)}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);pointer-events:none}
+#particle-cv{position:fixed;inset:0;z-index:1;pointer-events:none}
+.noise{position:fixed;inset:0;z-index:2;opacity:.025;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.scan{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(148,163,184,.14),transparent);z-index:4;pointer-events:none;animation:scanLine 14s linear infinite}
+main{position:relative;z-index:3}
+
+/* ── Nav ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;transition:all .3s}
+.nav-logo{display:flex;align-items:center;gap:8px}
+.dot-blink{width:8px;height:8px;border-radius:50%;background:var(--c-ecg);box-shadow:0 0 8px rgba(111,207,151,.5);animation:blink 1.2s ease-in-out infinite}
+.nav-links{display:flex;gap:12px;align-items:center}
+.nav-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;text-decoration:none;transition:all .2s}
+.nav-btn:hover{background:rgba(255,255,255,.08);color:var(--text);transform:translateY(-1px)}
+.nav-btn.active{background:rgba(111,207,151,.08);border-color:rgba(111,207,151,.22);color:var(--c-ecg)}
+
+/* ── Hero ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px}
+.badge-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em}
+
+/* ── Search ── */
+.search-wrap{position:relative;width:100%;max-width:620px;margin:0 auto}
+.search-input{width:100%;padding:16px 20px 16px 50px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;color:var(--text);font-family:'Syne',sans-serif;font-size:15px;outline:none;transition:all .3s;backdrop-filter:blur(20px)}
+.search-input:focus{border-color:rgba(111,207,151,.35);background:rgba(255,255,255,.06);box-shadow:0 0 0 3px rgba(111,207,151,.08)}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--c-ecg);font-size:16px;pointer-events:none}
+.search-count{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)}
+
+/* ── Category filters ── */
+.filters{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.filter-btn{padding:6px 16px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.04em;border:1px solid;cursor:pointer;background:transparent;transition:all .2s}
+.filter-btn:hover,.filter-btn.on{color:#fff}
+
+/* ── Grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{position:relative;overflow:hidden;background:var(--surface);backdrop-filter:blur(28px) saturate(1.4);border:1px solid var(--border);border-radius:var(--r);padding:22px;transition:all .4s cubic-bezier(.16,1,.3,1);cursor:default;--mx:-200px;--my:-200px}
+.card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(220px circle at var(--mx) var(--my),rgba(148,163,184,.08),transparent 70%);pointer-events:none;opacity:0;transition:opacity .3s;z-index:0}
+.card:hover::before{opacity:1}
+.card:hover{border-color:rgba(148,163,184,.18);transform:translateY(-4px);box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.card>*{position:relative;z-index:1}
+.card-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;margin-bottom:10px}
+.card-term{font-size:17px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em}
+.card-abbr{font-family:'JetBrains Mono',monospace;font-size:11px;margin-bottom:10px;opacity:.5}
+.card-def{font-size:13px;line-height:1.7;color:var(--dim)}
+.card-val{margin-top:10px;padding:8px 12px;background:rgba(0,0,0,.3);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11px}
+.card.hidden{display:none}
+
+/* ── Sections ── */
+section{padding:80px 24px}
+.section-inner{max-width:1000px;margin:0 auto}
+.section-inner.narrow{max-width:780px}
+.section-label{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.section-label::before,.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,.08))}
+.section-label::after{background:linear-gradient(to left,transparent,rgba(255,255,255,.08))}
+
+/* ── Professions ── */
+.prof-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.prof-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;transition:all .35s cubic-bezier(.16,1,.3,1)}
+.prof-card:hover{transform:translateY(-3px);box-shadow:0 20px 50px rgba(0,0,0,.5);border-color:rgba(148,163,184,.16)}
+.prof-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;flex-shrink:0}
+.prof-role{font-size:15px;font-weight:700;margin-bottom:4px}
+.prof-dept{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;margin-bottom:10px;opacity:.45}
+.prof-desc{font-size:12px;line-height:1.7;color:var(--dim)}
+
+/* ── SVG illustrations ── */
+.illus-wrap{display:flex;justify-content:center;margin:32px 0}
+
+/* ── Health system ── */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:28px 0}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;line-height:1}
+.stat-lbl{font-size:11px;margin-top:6px;color:var(--dim)}
+.alert-box{background:rgba(200,120,120,.06);border:1px solid rgba(200,120,120,.2);border-radius:14px;padding:24px;margin-top:24px}
+
+/* ── Footer ── */
+footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:center}
+
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(28px);filter:blur(5px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1),filter .8s cubic-bezier(.16,1,.3,1)}
+.reveal.in{opacity:1;transform:none;filter:blur(0)}
+
+/* ── Keyframes ── */
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes scanLine{0%{top:-2px;opacity:0}5%{opacity:1}95%{opacity:.3}100%{top:100%;opacity:0}}
+@keyframes orbA{0%,100%{transform:translate(0,0)}33%{transform:translate(4%,-5%) scale(1.04)}66%{transform:translate(-3%,3%) scale(.97)}}
+@keyframes orbB{0%,100%{transform:translate(0,0)}40%{transform:translate(-5%,4%) scale(1.05)}70%{transform:translate(4%,-3%) scale(.96)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style>
+</head>
+<body>
+
+<div id="bg-layer">
+  <div class="orb" style="width:65vw;height:65vw;top:-15%;left:-10%;background:radial-gradient(circle,rgba(50,80,140,.16) 0%,transparent 65%);animation:orbA 30s ease-in-out infinite"></div>
+  <div class="orb" style="width:50vw;height:50vw;top:30%;right:-14%;background:radial-gradient(circle,rgba(80,110,160,.11) 0%,transparent 65%);animation:orbB 38s ease-in-out infinite"></div>
+</div>
+<canvas id="particle-cv" aria-hidden="true"></canvas>
+<div class="noise"></div>
+<div class="scan"></div>
+
+<main>
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">
+    <div class="dot-blink"></div>
+    <span class="mono" style="font-size:13px;font-weight:700;letter-spacing:.12em">DIANE <span style="opacity:.4;font-weight:500">Simulateur</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html" class="nav-btn">← Accueil</a>
+    <a href="#encyclopedie" class="nav-btn active">📖 Encyclopédie</a>
+    <a href="#metiers" class="nav-btn">👥 Métiers</a>
+    <a href="#sante" class="nav-btn">🏥 Santé publique</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="reveal" style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <div style="height:1px;width:32px;background:linear-gradient(to right,transparent,rgba(148,163,184,.28))"></div>
+    <span class="badge-pill" style="background:rgba(111,207,151,.08);border:1px solid rgba(111,207,151,.2);color:var(--c-ecg)">♥ ENCYCLOPÉDIE MÉDICALE</span>
+    <div style="height:1px;width:32px;background:linear-gradient(to left,transparent,rgba(148,163,184,.28))"></div>
+  </div>
+  <h1 class="reveal" style="transition-delay:.08s;font-size:clamp(42px,9vw,110px);font-weight:800;letter-spacing:-.04em;line-height:.9;margin-bottom:18px">
+    <span class="grad">Encyclopédie</span><br>
+    <span style="font-size:clamp(20px,3.5vw,44px);color:rgba(255,255,255,.38);-webkit-text-fill-color:rgba(255,255,255,.38)">Soins Intensifs & SMUR</span>
+  </h1>
+  <p class="reveal" style="transition-delay:.16s;font-size:14px;color:var(--dim);max-width:480px;line-height:1.75;margin-bottom:40px">Référentiel complet des termes cliniques, scores, dispositifs et protocoles utilisés dans DIANE Simulateur — et dans les vrais services de réanimation.</p>
+
+  <!-- Illustration SVG Hero -->
+  <div class="reveal illus-wrap" style="transition-delay:.22s">
+    <svg viewBox="0 0 600 80" width="600" style="max-width:100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- Grid lines -->
+      <g stroke="rgba(28,44,55,.4)" stroke-width=".5">
+        <line x1="0" y1="20" x2="600" y2="20"/><line x1="0" y1="40" x2="600" y2="40"/><line x1="0" y1="60" x2="600" y2="60"/>
+        <line x1="100" y1="0" x2="100" y2="80"/><line x1="200" y1="0" x2="200" y2="80"/><line x1="300" y1="0" x2="300" y2="80"/><line x1="400" y1="0" x2="400" y2="80"/><line x1="500" y1="0" x2="500" y2="80"/>
+      </g>
+      <!-- ECG trace -->
+      <polyline filter="url(#glow)" fill="none" stroke="#6fcf97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        points="0,40 30,40 45,38 50,40 55,37 62,12 68,52 74,40 90,40 120,40 135,38 140,40 145,37 152,12 158,52 164,40 180,40 210,40 225,38 230,40 235,37 242,12 248,52 254,40 270,40 300,40 315,38 320,40 325,37 332,12 338,52 344,40 360,40 390,40 405,38 410,40 415,37 422,12 428,52 434,40 450,40 480,40 495,38 500,40 505,37 512,12 518,52 524,40 540,40 570,40 585,38 590,40"/>
+      <!-- Pleth trace -->
+      <polyline filter="url(#glow)" fill="none" stroke="#7eb8d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"
+        points="0,65 20,65 30,58 45,50 55,58 70,65 90,65 110,65 120,58 135,50 145,58 160,65 180,65 200,65 210,58 225,50 235,58 250,65 270,65 290,65 300,58 315,50 325,58 340,65 360,65 380,65 390,58 405,50 415,58 430,65 450,65 470,65 480,58 495,50 505,58 520,65 540,65 560,65 570,58 585,50 590,54"/>
+      <!-- Dot lumineux -->
+      <circle cx="590" cy="40" r="4" fill="#6fcf97" opacity=".6"/>
+      <circle cx="590" cy="40" r="2" fill="#fff"/>
+    </svg>
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap reveal" style="transition-delay:.28s;margin-bottom:28px">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" id="search" type="search" placeholder="Rechercher un terme, une abréviation, un score…" autocomplete="off">
+    <span class="search-count mono" id="search-count"></span>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters reveal" id="filters" style="transition-delay:.34s"></div>
+</div>
+
+<!-- ENCYCLOPEDIE -->
+<section id="encyclopedie" style="padding-top:0">
+  <div class="section-inner">
+    <div id="no-result" style="display:none;text-align:center;padding:60px 0;color:var(--dim)">
+      <div style="font-size:32px;margin-bottom:12px">🔍</div>
+      <div class="mono" style="font-size:13px">Aucun terme trouvé — essayez une autre recherche</div>
+    </div>
+    <div class="grid" id="cards-grid"></div>
+  </div>
+</section>
+
+<!-- METIERS -->
+<section id="metiers">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="mono" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--c-pleth)">▸ LES ACTEURS</span>
+    </div>
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <h2 style="font-size:clamp(28px,5vw,52px);font-weight:800;letter-spacing:-.035em;margin-bottom:12px">Les métiers qui font tourner<br><span class="grad">un service de réanimation</span></h2>
+      <p style="font-size:14px;color:var(--dim);max-width:540px;margin:0 auto;line-height:1.75">Un service de réanimation est un écosystème humain complexe. Derrière chaque patient pris en charge, une dizaine de professionnels coordonnent leurs expertises 24h/24, 365 jours par an.</p>
+    </div>
+
+    <!-- SVG illustration métiers -->
+    <div class="reveal illus-wrap">
+      <svg viewBox="0 0 500 120" width="500" style="max-width:100%" xmlns="http://www.w3.org/2000/svg">
+        <!-- Cercles reliés = équipe -->
+        <g opacity=".15" stroke="rgba(126,184,212,.5)" stroke-width="1" fill="none">
+          <line x1="250" y1="60" x2="80" y2="30"/><line x1="250" y1="60" x2="170" y2="100"/><line x1="250" y1="60" x2="330" y2="100"/><line x1="250" y1="60" x2="420" y2="30"/><line x1="250" y1="60" x2="130" y2="80"/><line x1="250" y1="60" x2="370" y2="80"/>
+        </g>
+        <circle cx="250" cy="60" r="18" fill="rgba(111,207,151,.12)" stroke="#6fcf97" stroke-width="1.5"/>
+        <text x="250" y="64" text-anchor="middle" font-size="14" fill="#6fcf97">♥</text>
+        <g font-family="'JetBrains Mono'" font-size="8" fill="rgba(255,255,255,.5)" text-anchor="middle">
+          <circle cx="80" cy="30" r="10" fill="rgba(126,184,212,.1)" stroke="#7eb8d4" stroke-width="1"/><text x="80" y="33">MD</text>
+          <circle cx="420" cy="30" r="10" fill="rgba(126,184,212,.1)" stroke="#7eb8d4" stroke-width="1"/><text x="420" y="33">IDE</text>
+          <circle cx="170" cy="100" r="10" fill="rgba(200,190,138,.1)" stroke="#c8be8a" stroke-width="1"/><text x="170" y="103">AS</text>
+          <circle cx="330" cy="100" r="10" fill="rgba(200,190,138,.1)" stroke="#c8be8a" stroke-width="1"/><text x="330" y="103">MK</text>
+          <circle cx="130" cy="80" r="10" fill="rgba(176,147,200,.1)" stroke="#b093c8" stroke-width="1"/><text x="130" y="83">Ph</text>
+          <circle cx="370" cy="80" r="10" fill="rgba(176,147,200,.1)" stroke="#b093c8" stroke-width="1"/><text x="370" y="83">CS</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="prof-grid" id="prof-grid"></div>
+  </div>
+</section>
+
+<!-- SANTÉ PUBLIQUE -->
+<section id="sante" style="background:rgba(0,0,0,.15)">
+  <div class="section-inner narrow">
+    <div class="section-label reveal">
+      <span class="mono" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--c-alarm)">▸ ENJEU DE SOCIÉTÉ</span>
+    </div>
+    <div class="reveal" style="text-align:center;margin-bottom:40px">
+      <h2 style="font-size:clamp(26px,4.5vw,48px);font-weight:800;letter-spacing:-.035em;margin-bottom:12px">Notre système de santé :<br><span class="grad">une urgence nationale</span></h2>
+    </div>
+
+    <!-- SVG carte hospitalière stylisée -->
+    <div class="reveal illus-wrap">
+      <svg viewBox="0 0 440 100" width="440" style="max-width:100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="dangerGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6fcf97"/><stop offset="50%" stop-color="#c8be8a"/><stop offset="100%" stop-color="#c87878"/></linearGradient></defs>
+        <!-- Ligne de vie -->
+        <rect x="20" y="48" width="400" height="4" rx="2" fill="rgba(255,255,255,.06)"/>
+        <rect x="20" y="48" width="280" height="4" rx="2" fill="url(#dangerGrad)" opacity=".7"/>
+        <!-- Marqueurs années -->
+        <g font-family="'JetBrains Mono'" font-size="9" fill="rgba(255,255,255,.3)" text-anchor="middle">
+          <text x="20" y="70">1975</text><text x="120" y="70">1995</text><text x="220" y="70">2010</text><text x="320" y="70">2020</text><text x="420" y="70">2024</text>
+        </g>
+        <!-- Icônes jalons -->
+        <text x="20" y="40" font-size="12" fill="#6fcf97">★</text>
+        <text x="120" y="40" font-size="12" fill="#c8be8a">★</text>
+        <text x="220" y="40" font-size="12" fill="#c8a47a">▼</text>
+        <text x="320" y="40" font-size="12" fill="#c87878">▼</text>
+        <text x="390" y="35" font-size="9" fill="#c87878" font-family="'JetBrains Mono'">ALERTE</text>
+        <line x1="420" y1="48" x2="420" y2="36" stroke="#c87878" stroke-width="1" stroke-dasharray="2"/>
+      </svg>
+    </div>
+
+    <div class="stat-row reveal" id="stat-row"></div>
+
+    <div class="reveal" id="sante-content"></div>
+
+    <div class="alert-box reveal">
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="font-size:28px;flex-shrink:0">🚨</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:var(--c-alarm);margin-bottom:8px">Ce que DIANE Simulateur veut rappeler</div>
+          <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,.55)">Derrière chaque chiffre affiché sur un moniteur patient, il y a une équipe de soignants épuisés, sous-payés, qui continuent malgré tout. DIANE Simulateur ne prétend pas remplacer leur expertise — il cherche à en révéler la complexité, pour que chacun comprenne ce que représente réellement un service de réanimation.</p>
+          <p style="font-size:12px;margin-top:10px;color:rgba(255,255,255,.35)">Composez le <strong style="color:var(--c-ecg)">15 (SAMU)</strong> ou le <strong style="color:var(--c-ecg)">112</strong> en cas d'urgence médicale réelle.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="max-width:860px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="dot-blink"></div>
+        <span class="mono" style="font-size:12px;color:rgba(255,255,255,.4)">DIANE Simulateur — Encyclopédie v12</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:rgba(255,255,255,.2)">Codé avec</span>
+        <a href="https://claude.ai" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.18);color:#e8a855;text-decoration:none">Claude</a>
+        <a href="https://aistudio.google.com" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(66,133,244,.07);border:1px solid rgba(66,133,244,.18);color:#7aabef;text-decoration:none">Google AI Studio</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</main>
+
+<script>
+// ══════════════════════════════════════
+// DATA — termes encyclopédiques
+// ══════════════════════════════════════
+const CAT = {
+  'Monitoring':   {c:'#7eb8d4', bg:'rgba(126,184,212,.1)', border:'rgba(126,184,212,.2)'},
+  'Score':        {c:'#c8a47a', bg:'rgba(200,164,122,.1)', border:'rgba(200,164,122,.2)'},
+  'Médicament':   {c:'#b093c8', bg:'rgba(176,147,200,.1)', border:'rgba(176,147,200,.2)'},
+  'Procédure':    {c:'#6fcf97', bg:'rgba(111,207,151,.1)', border:'rgba(111,207,151,.2)'},
+  'Pathologie':   {c:'#c87878', bg:'rgba(200,120,120,.1)', border:'rgba(200,120,120,.2)'},
+  'Ventilation':  {c:'#c8be8a', bg:'rgba(200,190,138,.1)', border:'rgba(200,190,138,.2)'},
+  'Biologie':     {c:'#8ba4c8', bg:'rgba(139,164,200,.1)', border:'rgba(139,164,200,.2)'},
+};
+
+const TERMS = [
+  // Monitoring
+  {cat:'Monitoring',term:'Électrocardiogramme',abbr:'ECG',def:'Enregistrement de l\'activité électrique cardiaque via des électrodes cutanées. Permet de détecter arythmies, ischémies, troubles de conduction. En réanimation : surveillance continue par dérivation II.',val:'Norme : rythme sinusal 60–100 bpm · intervalle PR 120–200 ms · QRS < 120 ms'},
+  {cat:'Monitoring',term:'Saturation pulsée en O₂',abbr:'SpO₂',def:'Mesure non-invasive du pourcentage d\'hémoglobine saturée en oxygène par spectrophotométrie pulsatile (oxymétrie de pouls). Proxy de la SaO₂ artérielle — corrélation fiable au-delà de 70%.',val:'Cible réanimation : ≥ 94–96% · BPCO : 88–92%'},
+  {cat:'Monitoring',term:'Pression artérielle moyenne',abbr:'PAM',def:'Pression de perfusion tissulaire effective. Calculée : PAD + ⅓ (PAS-PAD). Paramètre clé pour évaluer le choc et guider les vasopresseurs. Reflet de la perfusion des organes vitaux.',val:'Cible sepsis : PAM ≥ 65 mmHg · normale : 70–100 mmHg'},
+  {cat:'Monitoring',term:'Pression artérielle invasive',abbr:'PAi',def:'Cathéter intra-artériel (radial ou fémoral) permettant une mesure continue de la PA et des prélèvements sanguins répétés sans ponction itérative. Gold standard en choc hémodynamique.',val:'Voie radiale préférée · vérifier test d\'Allen · zéro à niveau cœur'},
+  {cat:'Monitoring',term:'Pression Veineuse Centrale',abbr:'PVC',def:'Pression mesurée dans la veine cave supérieure ou l\'oreillette droite via un cathéter veineux central (VVC). Reflet de la précharge droite — valeur seule peu fiable pour guider le remplissage.',val:'Normale : 0–8 mmHg · interprétation contextuelle obligatoire'},
+  {cat:'Monitoring',term:'Capnographie',abbr:'EtCO₂',def:'Mesure de la concentration en CO₂ en fin d\'expiration par spectrophotométrie infrarouge. Reflet indirect de la PaCO₂ (-5 mmHg). Vérification immédiate de l\'intubation, surveillance ventilation.',val:'Normale : 35–45 mmHg · ACR : 0 → retour si ≥ 10 mmHg sous RCP'},
+  {cat:'Monitoring',term:'Pression artérielle pulmonaire',abbr:'PAP',def:'Mesurée par cathétérisme droit (Swan-Ganz). Distingue l\'hypertension artérielle pulmonaire pré- et post-capillaire. Usage en déclin au profit de l\'échocardiographie.',val:'Systolique normale : 15–25 mmHg · PAP moy < 25 mmHg'},
+  {cat:'Monitoring',term:'Débit cardiaque',abbr:'DC',def:'Volume sanguin éjecté par le cœur par minute. DC = Volume d\'éjection × Fréquence cardiaque. Mesuré par thermodilution (Swan-Ganz), échocardiographie doppler ou méthodes mini-invasives.',val:'Normale : 4–8 L/min · Index cardiaque : 2.2–4 L/min/m²'},
+  // Scores
+  {cat:'Score',term:'Sequential Organ Failure Assessment',abbr:'SOFA',def:'Score de défaillance multiviscérale calculé sur 6 organes : respiratoire (PaO₂/FiO₂), coagulation (plaquettes), foie (bilirubine), cardiovasculaire (PAM + vasopresseurs), neurologique (GCS), rénal (créatinine/diurèse). Score 0–24.',val:'≥ 2 points = probable défaillance organique · mortalité : score 12–24 → > 80%'},
+  {cat:'Score',term:'Glasgow Coma Scale',abbr:'GCS',def:'Évaluation de l\'état de conscience sur 3 composantes : ouverture des yeux (1–4), réponse verbale (1–5), réponse motrice (1–6). Utilisé pour décision d\'intubation, suivi neurologique.',val:'Score 15 = normal · ≤ 8 = coma profond → IOT en général · minimum : 3'},
+  {cat:'Score',term:'Richmond Agitation Sedation Scale',abbr:'RASS',def:'Échelle de sédation/agitation en 10 niveaux : +4 (combatif) à -5 (réponse absente). Standard international pour titrer la sédation en réanimation. Évaluée toutes les 4–8h.',val:'Cible habituelle : RASS -1 à -2 · RASS -3 à -5 = sédation profonde'},
+  {cat:'Score',term:'Ratio PaO₂/FiO₂',abbr:'P/F',def:'Index d\'oxygénation pulmonaire. PaO₂ (gazométrie artérielle) divisé par la fraction inspirée en O₂. Permet de classifier le syndrome de détresse respiratoire aiguë (SDRA) indépendamment de l\'FiO₂.',val:'Normal > 400 · SDRA léger : 200–300 · modéré : 100–200 · sévère < 100'},
+  {cat:'Score',term:'Simplified Acute Physiology Score',abbr:'SAPS II',def:'Score pronostique admis en réanimation basé sur 17 variables physiologiques, âge, type d\'admission et comorbidités. Calculé dans les 24 premières heures. Estimateur de mortalité hospitalière.',val:'Score 0–163 · probabilité de décès estimée de 0 à ~100%'},
+  {cat:'Score',term:'Quick SOFA',abbr:'qSOFA',def:'Score de dépistage rapide du sepsis hors réanimation : FR ≥ 22/min, altération de la conscience (GCS < 15), PAS ≤ 100 mmHg. Deux critères = forte suspicion de sepsis. NB : sensibilité limitée.',val:'≥ 2 critères = suspicion sepsis → bilan + lactate + hémocultures urgents'},
+  // Médicaments
+  {cat:'Médicament',term:'Noradrénaline',abbr:'NAD',def:'Catécholamine vasopresseur de référence du choc septique et distributif. Agoniste α1 puissant → vasoconstriction artérielle et veineuse → ↑ PAM. Effet β1 modéré. Titration continue sur VVC.',val:'Dose usuelle : 0.1–1 µg/kg/min · titration sur PAM cible ≥ 65 mmHg'},
+  {cat:'Médicament',term:'Dobutamine',abbr:'Dobu',def:'Catécholamine inotrope positive. Agoniste β1 sélectif → ↑ contractilité myocardique, ↑ DC. Indiquée dans le choc cardiogénique avec bas débit. Chronotrope positive modérée — risque arythmogène.',val:'Dose : 2.5–20 µg/kg/min · association NAD si hypotension concomitante'},
+  {cat:'Médicament',term:'Adrénaline',abbr:'Adr',def:'Catécholamine d\'urgence : ACR (1mg IV/IO toutes 3–5 min), choc anaphylactique (0.5 mg IM), choc réfractaire. Agoniste α1+α2+β1+β2. Puissant vasopresseur et inotrope.',val:'ACR : 1 mg IVD pur · anaphylaxie : 0.5 mg IM cuisse · titration choc'},
+  {cat:'Médicament',term:'Propofol',abbr:'Prop',def:'Anesthésique intraveineux utilisé pour la sédation continue en réanimation et l\'induction anesthésique. Délai d\'action rapide, demi-vie courte permettant un réveil rapide. Liposoluble — émulsion lipidique.',val:'Sédation : 0.5–4 mg/kg/h · PRSS (syndrome perfusion propofol) > 4 mg/kg/h'},
+  {cat:'Médicament',term:'Midazolam',abbr:'Mida',def:'Benzodiazépine de sédation et anxiolyse en réanimation. Potentialise les effets du GABA. Accumulation possible lors d\'administration prolongée (demi-vie longue chez insuffisant hépatique).',val:'Sédation : 0.04–0.2 mg/kg/h · amnésiant · antidote : flumazénil'},
+  {cat:'Médicament',term:'Sufentanil',abbr:'Suf',def:'Opioïde puissant (10× morphine) utilisé en analgésie-sédation en réanimation. Analgésique de référence en France pour la douleur procédurale et la sédation profonde. Action rapide.',val:'0.2–0.7 µg/kg/h · surveillance dépression respiratoire · antidote : naloxone'},
+  {cat:'Médicament',term:'Amiodarone',abbr:'Amiod',def:'Antiarythmique classe III (Vaughan-Williams). Traitement de référence des arythmies ventriculaires réfractaires (FV, TV) post-choc électrique externe. Utilisation en AC dans les arythmies réfractaires.',val:'ACR : 300 mg IVD → 150 mg · entretien : 900 mg/24h · demi-vie très longue'},
+  {cat:'Médicament',term:'Héparine sodium',abbr:'HNF',def:'Anticoagulant parentéral d\'action immédiate par potentialisation de l\'antithrombine III. Indication : SCA, MTEV, CIVD, prévention thrombose sur cathéter. Surveillance TCA et plaquettes.',val:'Bolus SCA : 60–70 UI/kg · entretien : TCA ratio 2–3 · antidote : protamine'},
+  // Procédures
+  {cat:'Procédure',term:'Intubation oro-trachéale',abbr:'IOT',def:'Mise en place d\'une sonde endotrachéale sous laryngoscopie directe ou vidéolaryngoscopie pour protéger les voies aériennes et assurer la ventilation mécanique. Procédure à haute criticité.',val:'Vérification : auscultation + capnographie · profondeur : 21–23 cm · pression ballonnet : 25–30 cmH₂O'},
+  {cat:'Procédure',term:'Voie veineuse centrale',abbr:'VVC',def:'Cathéter à l\'extrémité dans la veine cave (jugulaire interne, sous-clavière, fémorale). Permet perfusion de vasopresseurs, nutrition parentérale, PVC, transfusion rapide. Pose échoguidée recommandée.',val:'Vérification Rx thorax post-pose · retrait si non justifié · bundle anti-BPICVS'},
+  {cat:'Procédure',term:'Défibrillation',abbr:'CEE',def:'Choc électrique externe synchronisé (cardioversion) ou non (défibrillation) délivrant une énergie entre les électrodes pour interrompre une arythmie ventriculaire létale. Délai = pronostic.',val:'FV/TV sans pouls : 200 J biphasique · TV avec pouls : synchronisé 100–200 J'},
+  {cat:'Procédure',term:'Réanimation cardio-pulmonaire',abbr:'RCP',def:'Ensemble des manœuvres de survie en cas d\'arrêt cardiaque : compressions thoraciques 100–120/min à 5–6 cm de profondeur, ventilation 30:2 ou continue avec protection VA. BALS → ACLS.',val:'Compression : talon main · rapport 30:2 · défibrillation dès que disponible'},
+  {cat:'Procédure',term:'Échographie au lit du patient',abbr:'POCUS',def:'Echographie réalisée au lit par le clinicien pour aide à la décision immédiate : FAST étendu trauma, évaluation cardiaque (FEVG, épanchement), pleuropulmonaire (pneumothorax, épanchement).',val:'Protocoles : FAST · RUSH · BLUE · FALLS · Rapid Echo'},
+  {cat:'Procédure',term:'Fibroscopie bronchique',abbr:'FBS',def:'Exploration endoscopique des voies aériennes sous-glottiques. Permet aspiration brossage, LBA pour microbiologie, désobstruction, guidage de l\'intubation difficile, vérification de la position de la sonde.',val:'Lavage broncho-alvéolaire (LBA) : pneumonie sous VM, PID'},
+  {cat:'Procédure',term:'Drainage thoracique',abbr:'DT',def:'Exsufflation ou drainage chirurgical d\'un pneumothorax compressif ou d\'un hémothorax. Urgence vitale pour le PNO compressif. Drain de Monod ou aiguille d\'urgence 2ème EIC ligne médioclaviculaire.',val:'PNO compressif : exsufflation urgente 2e EIC · puis drain 5e EIC ligne axillaire'},
+  // Pathologies
+  {cat:'Pathologie',term:'Choc septique',abbr:'',def:'Définition Sepsis-3 : sepsis + vasoplégie nécessitant vasopresseur pour PAM ≥ 65 + lactate > 2 mmol/L malgré remplissage. Mortalité 40–60%. Prise en charge : bundle 1h, hémocultures, ATB large spectre, remplissage, NAD.',val:'Bundle 1h : lactate · hémocultures · ATB · remplissage 30 mL/kg · NAD si besoin'},
+  {cat:'Pathologie',term:'Syndrome de Détresse Respiratoire Aiguë',abbr:'SDRA',def:'Insuffisance respiratoire aiguë hypoxémique (P/F < 300) sur Rx ou TDM avec opacités bilatérales, non expliquée par insuffisance cardiaque. VM protectrice : VT 6 mL/kg, P plateau < 30 cmH₂O, PEP titrée.',val:'Décubitus ventral ≥ 16h si P/F < 150 · NO inhalé · ECMO VV en dernier recours'},
+  {cat:'Pathologie',term:'Arrêt cardiaque',abbr:'ACR',def:'Cessation de l\'activité mécanique cardiaque efficace avec absence de pouls central. Causes : FV, TV sans pouls, asystolie, DEM. RCP immédiate + défibrillation précoce = seuls déterminants du pronostic.',val:'4 H réversibles : Hypoxie, Hypovolémie, Hypo/hyperkaliémie, Hypothermie · 4 T : Tamponnade, Thrombose, Tension PNO, Toxiques'},
+  {cat:'Pathologie',term:'Infarctus du myocarde avec sus-ST',abbr:'IDM STEMI',def:'Occlusion coronaire aiguë complète avec sus-décalage ST persistant ≥ 2mm en 2 dérivations contiguës. Urgence absolue → reperfusion < 90 min (ICP primaire) ou < 30 min (thrombolyse si délai ICP > 120 min).',val:'Délai door-to-balloon < 90 min · aspirine + ticagrélor + héparine'},
+  {cat:'Pathologie',term:'État de mal épileptique',abbr:'EME',def:'Crise épileptique > 5 min ou crises subrentrantes sans récupération. Urgence neurologique. Prise en charge étagée : benzodiazépine IV → phénytoine/valproate → anesthésie générale si réfractaire.',val:'Lorazépam 0.1 mg/kg → Phénytoine 20 mg/kg → Propofol/midazolam'},
+  {cat:'Pathologie',term:'Hypertension intracrânienne',abbr:'HTIC',def:'Pression intracrânienne (PIC) > 20 mmHg de façon soutenue. Causes : trauma crânien, hémorragie, AVC ischémique malin, encéphalite. Traitement : osmothérapie, position tête 30°, sédation, dérivation.',val:'PIC normale : 5–15 mmHg · PPC = PAM – PIC · cible PPC : 60–70 mmHg'},
+  // Ventilation
+  {cat:'Ventilation',term:'Ventilation en Pression Positive Continue',abbr:'CPAP / PEP',def:'Maintien d\'une pression positive constante dans les voies aériennes en ventilation spontanée. Recrute les alvéoles collabées, améliore l\'oxygénation, réduit le shunt. OAP, SDRA modéré, apnées du sommeil.',val:'PEP 5–20 cmH₂O · indiquée OAP cardiogénique · surveillance hypotension'},
+  {cat:'Ventilation',term:'Volume courant',abbr:'VT',def:'Volume d\'air insufflé à chaque cycle ventilatoire. Stratégie protectrice SDRA : 6 mL/kg de poids prédit (PP). Hypercapnie permissive tolérée si nécessaire pour maintenir P plateau < 30 cmH₂O.',val:'6 mL/kg poids prédit · PP hommes : 50 + 0.91(taille cm – 152.4) · PP femmes : 45.5 + 0.91(taille – 152.4)'},
+  {cat:'Ventilation',term:'Fraction inspirée en oxygène',abbr:'FiO₂',def:'Proportion d\'O₂ dans le mélange gazeux insufflé. Air ambiant : 21%. Objectif : FiO₂ minimale pour SpO₂ cible. Hyperoxie délétère → titration rigoureuse. Mesurée en continu sous VM.',val:'Cible SpO₂ 94–96% · FiO₂ 1.0 uniquement urgence · sevrage dès que possible'},
+  {cat:'Ventilation',term:'Pression expiratoire positive',abbr:'PEP/PEEP',def:'Pression maintenue en fin d\'expiration pour maintenir le recrutement alvéolaire. Augmente la CRF, améliore l\'oxygénation, prévient le collapsus cyclique. Compromis : oxygénation vs retentissement hémodynamique.',val:'SDRA : PEP titrée selon table ARDSnet · PEP 5 cmH₂O chez tout patient intubé'},
+  // Biologie
+  {cat:'Biologie',term:'Lactate artériel',abbr:'Lact',def:'Biomarqueur de l\'anaérobiose tissulaire par hypoperfusion. Élévation = inadéquation apport/consommation en O₂. Clearance du lactate (réduction ≥ 10%/2h) = critère de réponse thérapeutique au sepsis.',val:'Normale < 2 mmol/L · sepsis : > 2 · choc septique : > 2 malgré remplissage'},
+  {cat:'Biologie',term:'Gazométrie artérielle',abbr:'GDSa',def:'Analyse du sang artériel : pH, PaO₂, PaCO₂, HCO₃⁻, lactate, Hb, glucose. Évalue l\'équilibre acido-basique, l\'oxygénation et la ventilation. Prélèvement radial, huméral ou fémoral.',val:'pH 7.38–7.42 · PaO₂ 80–100 mmHg · PaCO₂ 35–45 mmHg · HCO₃⁻ 22–26 mEq/L'},
+  {cat:'Biologie',term:'Procalcitonine',abbr:'PCT',def:'Biomarqueur bactérien de l\'infection systémique. Produite par les tissus en réponse aux endotoxines bactériennes. Aide au diagnostic de sepsis bactérien vs viral, guide la durée de l\'antibiothérapie.',val:'< 0.1 : très faible risque · 0.1–0.5 : faible · 0.5–2 : modéré · > 2 : fort risque sepsis'},
+  {cat:'Biologie',term:'Numération Formule Sanguine',abbr:'NFS',def:'Hémogramme complet : érythrocytes, hémoglobine, hématocrite, VGM, plaquettes, leucocytes avec formule. Dépistage anémie, thrombopénie (CIVD, TIH), infection (hyperleucocytose).',val:'Hb < 7 g/dL = seuil transfusion réa · Plaq < 50 000 = risque hémorragique'},
+];
+
+// ══════════════════════════════════════
+// DATA — métiers
+// ══════════════════════════════════════
+const PROFS = [
+  {icon:'🩺',role:'Médecin réanimateur',dept:'Praticien Hospitalier',color:'rgba(126,184,212,.12)',border:'rgba(126,184,212,.22)',c:'#7eb8d4',desc:'Spécialiste en médecine intensive-réanimation (MIR). Coordonne l\'ensemble des soins, prescrit et adapte les thérapeutiques. Astreintes de garde 24h, prise en charge des urgences vitales. Formation : 12 ans post-bac minimum.'},
+  {icon:'💊',role:'Infirmier(ère) DE',dept:'IDE Réanimation',color:'rgba(111,207,151,.12)',border:'rgba(111,207,151,.22)',c:'#6fcf97',desc:'Pivot central de la prise en charge : administration des médicaments, surveillance des constantes, soins techniques (VVC, IOT, drain). Ratio 1 IDE pour 2 à 3 patients en réanimation. Travail en 12h alternés.'},
+  {icon:'🫁',role:'IADE',dept:'Infirmier Anesthésiste',color:'rgba(176,147,200,.12)',border:'rgba(176,147,200,.22)',c:'#b093c8',desc:'Infirmier spécialisé en anesthésie-réanimation. Gère l\'induction anesthésique, la ventilation per-opératoire, la douleur post-opératoire. Intervient en SMUR et déchocage pour les intubations difficiles.'},
+  {icon:'🤲',role:'Aide-Soignant(e)',dept:'AS Réanimation',color:'rgba(200,190,138,.12)',border:'rgba(200,190,138,.22)',c:'#c8be8a',desc:'Assure les soins d\'hygiène et de confort, nursing intensif des patients souvent inconscients, aide à la mobilisation, prévention des escarres. Lien humain indispensable quand le patient ne peut communiquer.'},
+  {icon:'🫀',role:'Kinésithérapeute',dept:'Kiné respi & rééducation',color:'rgba(200,164,122,.12)',border:'rgba(200,164,122,.22)',c:'#c8a47a',desc:'Spécialiste en kinésithérapie respiratoire et motrice. Désencombrement bronchique, sevrage ventilatoire, mobilisation précoce pour prévenir la déconditionnement musculaire. Rôle pronostique majeur.'},
+  {icon:'⚗️',role:'Pharmacien hospitalier',dept:'Pharmacie clinique',color:'rgba(139,164,200,.12)',border:'rgba(139,164,200,.22)',c:'#8ba4c8',desc:'Valide les prescriptions, détecte les interactions médicamenteuses, adapte les posologies à la fonction rénale/hépatique. En réanimation : préparation des seringues électriques, ATB en continu, nutrition parentérale.'},
+  {icon:'📊',role:'Cadre de santé',dept:'Encadrement',color:'rgba(148,163,184,.12)',border:'rgba(148,163,184,.22)',c:'#94a3b8',desc:'Organise et coordonne les équipes soignantes. Gestion des plannings en sous-effectif chronique, formation continue, interface entre médecins et soignants. Première ligne pour absorber les crises de personnel.'},
+  {icon:'🧠',role:'Neuropsychologue',dept:'Équipe liaison',color:'rgba(200,120,120,.12)',border:'rgba(200,120,120,.22)',c:'#c87878',desc:'Évalue les séquelles cognitives post-réanimation (syndrome post-soins intensifs - SPSI). Accompagne le réveil traumatique, le syndrome confusionnel aigu. Prévention du PTSD chez patients et soignants.'},
+  {icon:'📡',role:'Équipe SMUR',dept:'Service Mobile Urgence Réanimation',color:'rgba(111,207,151,.12)',border:'rgba(111,207,151,.22)',c:'#6fcf97',desc:'Médecin urgentiste + IADE ou IDE SMUR. Primaire (lieu d\'accident) et secondaire (transfert entre établissements). Réanimation en conditions difficiles avec matériel embarqué. Régulation par le SAMU (15).'},
+  {icon:'🗣️',role:'Médecin régulateur SAMU',dept:'Centre 15',color:'rgba(126,184,212,.12)',border:'rgba(126,184,212,.22)',c:'#7eb8d4',desc:'Médecin prenant les appels au 15, évalue la gravité, décide de l\'envoi des secours (SMUR, pompiers, médecin de ville). Oriente vers la structure adaptée. Gestion simultanée de dizaines de dossiers.'},
+  {icon:'🔬',role:'Biologiste médical',dept:'Laboratoire de garde',color:'rgba(200,190,138,.12)',border:'rgba(200,190,138,.22)',c:'#c8be8a',desc:'Assure la disponibilité 24h/24 des analyses urgentes : gazométrie, NFS, hémostase, cultures bactériologiques. Interface critique pour les décisions thérapeutiques. Délai d\'obtention = déterminant de prise en charge.'},
+  {icon:'📋',role:'Secrétaire médicale',dept:'Administration soins',color:'rgba(148,163,184,.12)',border:'rgba(148,163,184,.22)',c:'#94a3b8',desc:'Gère les dossiers médicaux, comptes-rendus, communications entre services et familles. Rôle invisible mais fondamental pour la continuité de l\'information et la relation avec les proches en période de détresse.'},
+];
+
+// ══════════════════════════════════════
+// DATA — santé publique
+// ══════════════════════════════════════
+const STATS = [
+  {n:'5 756',lbl:'Lits de réanimation en France',c:'#7eb8d4'},
+  {n:'−58 000',lbl:'Lits hôpital perdus (1995–2022)',c:'#c87878'},
+  {n:'1/3',lbl:'Infirmières quittant la profession < 5 ans après diplôme',c:'#c8a47a'},
+  {n:'30–40%',lbl:'Postes non pourvus en réanimation (2023)',c:'#c87878'},
+  {n:'2,3×',lbl:'Écart salaire IDE FR vs moyenne OCDE',c:'#b093c8'},
+  {n:'14e',lbl:'Rang France dépenses santé/habitant (OCDE)',c:'#8ba4c8'},
+];
+
+const SANTE_PARAS = [
+  {title:'Un héritage à préserver',c:'#7eb8d4',icon:'🏛️',txt:'La France a construit au XXe siècle l\'un des systèmes de santé les plus équitables du monde : universalité, solidarité, proximité géographique. L\'accès aux soins intensifs n\'y est pas conditionné par la capacité à payer — une exception mondiale précieuse.'},
+  {title:'La crise des ressources humaines',c:'#c8a47a',icon:'👥',txt:'L\'attractivité des carrières hospitalières s\'est effondrée : salaires inférieurs aux pays voisins, conditions de travail dégradées, manque de reconnaissance. Des milliers de postes restent vacants en réanimation, SMUR et urgences. Ce sont des vies en danger.'},
+  {title:'La désertification médicale',c:'#b093c8',icon:'🗺️',txt:'Des territoires entiers se retrouvent sans médecins généralistes, sans maternité à moins d\'une heure, sans service d\'urgences ouvert la nuit. Le continuum de soins se fragmente. En cas d\'urgence vitale, chaque minute compte — et les délais s\'allongent.'},
+  {title:'Le défi de la réanimation moderne',c:'#c8be8a',icon:'⚙️',txt:'Les progrès technologiques (ECMO, monitorage hémodynamique avancé, biologie moléculaire rapide) sauvent des vies qui n\'auraient pas survécu il y a 20 ans. Mais ils exigent des équipes formées, des équipements maintenus, des budgets suffisants — incompatibles avec l\'austérité.'},
+  {title:'Ce que chacun peut faire',c:'#6fcf97',icon:'💡',txt:'Soutenir le service public hospitalier, valoriser les soignants, s\'informer et informer. La qualité des soins de demain dépend des choix collectifs d\'aujourd\'hui : financement, formation, conditions de travail. DIANE Simulateur veut contribuer à cette prise de conscience.'},
+];
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function buildFilters() {
+  const wrap = document.getElementById('filters');
+  const cats = Object.keys(CAT);
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-btn on';
+  allBtn.dataset.cat = 'all';
+  const a = CAT['Monitoring'];
+  allBtn.style.cssText = `color:#fff;border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.08)`;
+  allBtn.textContent = 'Tout';
+  wrap.appendChild(allBtn);
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.cat = cat;
+    btn.style.cssText = `color:${CAT[cat].c};border-color:${CAT[cat].border}`;
+    btn.textContent = cat;
+    wrap.appendChild(btn);
+  });
+  wrap.addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    wrap.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('on');
+      const cc = CAT[b.dataset.cat];
+      b.style.background = 'transparent';
+      b.style.color = cc ? cc.c : '#fff';
+    });
+    btn.classList.add('on');
+    btn.style.background = btn.dataset.cat === 'all' ? 'rgba(255,255,255,.08)' : CAT[btn.dataset.cat]?.bg || 'rgba(255,255,255,.08)';
+    btn.style.color = '#fff';
+    filterCards();
+  });
+}
+
+function buildCards() {
+  const grid = document.getElementById('cards-grid');
+  TERMS.forEach((t, i) => {
+    const cc = CAT[t.cat];
+    const div = document.createElement('div');
+    div.className = 'card reveal';
+    div.dataset.cat = t.cat;
+    div.dataset.search = (t.term + ' ' + (t.abbr || '') + ' ' + t.def).toLowerCase();
+    div.style.transitionDelay = Math.min(i % 6 * 60, 300) + 'ms';
+    div.innerHTML = `
+      <span class="card-tag" style="background:${cc.bg};border:1px solid ${cc.border};color:${cc.c}">${t.cat}</span>
+      <div class="card-term">${t.term}</div>
+      ${t.abbr ? `<div class="card-abbr mono">${t.abbr}</div>` : ''}
+      <div class="card-def">${t.def}</div>
+      ${t.val ? `<div class="card-val" style="border-left:2px solid ${cc.c};color:${cc.c}">${t.val}</div>` : ''}
+    `;
+    div.addEventListener('mousemove', e => {
+      const r = div.getBoundingClientRect();
+      div.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      div.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+    div.addEventListener('mouseleave', () => {
+      div.style.setProperty('--mx', '-200px');
+      div.style.setProperty('--my', '-200px');
+    });
+    grid.appendChild(div);
+  });
+  updateCount();
+}
+
+function filterCards() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const activeCat = document.querySelector('.filter-btn.on')?.dataset.cat || 'all';
+  let visible = 0;
+  document.querySelectorAll('.card').forEach(c => {
+    const matchCat = activeCat === 'all' || c.dataset.cat === activeCat;
+    const matchQ = !q || c.dataset.search.includes(q);
+    const show = matchCat && matchQ;
+    c.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+  updateCount(visible);
+  document.getElementById('no-result').style.display = visible === 0 ? 'block' : 'none';
+}
+
+function updateCount(n) {
+  const total = TERMS.length;
+  const shown = n !== undefined ? n : total;
+  document.getElementById('search-count').textContent = shown === total ? `${total} termes` : `${shown} / ${total}`;
+}
+
+function buildProfs() {
+  const grid = document.getElementById('prof-grid');
+  PROFS.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'prof-card reveal';
+    div.style.transitionDelay = Math.min(i % 4 * 70, 250) + 'ms';
+    div.innerHTML = `
+      <div class="prof-icon" style="background:${p.color};border:1px solid ${p.border}">${p.icon}</div>
+      <div class="prof-role">${p.role}</div>
+      <div class="prof-dept mono" style="color:${p.c}">${p.dept}</div>
+      <div class="prof-desc">${p.desc}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function buildSante() {
+  const row = document.getElementById('stat-row');
+  STATS.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'stat-box reveal';
+    div.innerHTML = `<div class="stat-num" style="color:${s.c}">${s.n}</div><div class="stat-lbl">${s.lbl}</div>`;
+    row.appendChild(div);
+  });
+  const wrap = document.getElementById('sante-content');
+  SANTE_PARAS.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'reveal';
+    div.style.cssText = `background:var(--surface);border:1px solid var(--border);border-left:3px solid ${p.c};border-radius:var(--r);padding:22px 26px;margin-bottom:14px`;
+    div.style.transitionDelay = (i * 80) + 'ms';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:18px">${p.icon}</span>
+        <span style="font-weight:700;font-size:14px;color:${p.c}">${p.title}</span>
+      </div>
+      <p style="font-size:13px;line-height:1.8;color:var(--dim)">${p.txt}</p>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════
+// PARTICLES
+// ══════════════════════════════════════
+(function(){
+  const cv = document.getElementById('particle-cv');
+  const ctx = cv.getContext('2d');
+  const COLS = ['#6fcf97','#7eb8d4','#c8be8a','#b093c8','#8ba4c8'];
+  let W, H;
+  const resize = () => { W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; };
+  resize();
+  window.addEventListener('resize', resize, {passive:true});
+  const pts = Array.from({length:55}, (_, i) => ({
+    x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+    vx: (Math.random()-.5)*.12, vy: (Math.random()-.5)*.12,
+    r: Math.random()*1.1+.25, a: Math.random()*.18+.04,
+    c: COLS[i%COLS.length], wt: Math.random()*Math.PI*2,
+    ws: Math.random()*.004+.002, wa: Math.random()*.16+.04
+  }));
+  (function tick(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.wt+=p.ws; p.x+=p.vx+Math.sin(p.wt)*p.wa; p.y+=p.vy+Math.cos(p.wt*.7)*p.wa*.6;
+      if(p.x<-5) p.x=W+5; if(p.x>W+5) p.x=-5;
+      if(p.y<-5) p.y=H+5; if(p.y>H+5) p.y=-5;
+      ctx.globalAlpha=p.a; ctx.fillStyle=p.c;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(tick);
+  })();
+})();
+
+// ══════════════════════════════════════
+// INTERSECTION OBSERVER — reveal
+// ══════════════════════════════════════
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    e.target.classList.add('in');
+    obs.unobserve(e.target);
+  });
+},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+
+// ══════════════════════════════════════
+// NAV scroll
+// ══════════════════════════════════════
+const navEl = document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+  navEl.style.background = window.scrollY>50 ? 'rgba(6,8,16,.85)' : 'transparent';
+  navEl.style.backdropFilter = window.scrollY>50 ? 'blur(24px)' : 'none';
+  navEl.style.borderBottom = window.scrollY>50 ? '1px solid rgba(255,255,255,.05)' : 'none';
+},{passive:true});
+
+// ══════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════
+document.getElementById('search').addEventListener('input', filterCards);
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+buildFilters();
+buildCards();
+buildProfs();
+buildSante();
+// Observe all .reveal after DOM build
+setTimeout(()=>{ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el)); }, 50);
+</script>
+</body>
+</html>

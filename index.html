@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z6JXD0T2V0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Z6JXD0T2V0');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ═══ SEO PRIMAIRE ═══ -->
+<title>DIANE Simulateur — Simulation médicale haute-fidélité | Réanimation, SMUR, Déchocage</title>
+<meta name="description" content="DIANE Simulateur : simulation haute-fidélité de soins intensifs en navigateur. Réanimation, déchocage, SMUR, régulation SAMU — moniteurs temps réel, audio IEC 60601-1-8, 23 motifs cliniques. Gratuit, sans installation.">
+<meta name="author" content="Nicolas Bouteiller">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="simulation médicale, réanimation, soins intensifs, SMUR, SAMU, déchocage, moniteur patient, ECG simulateur, formation médicale, serious game médical">
+
+<link rel="canonical" href="https://dianesimulateur.netlify.app/">
+
+<!-- ═══ OPEN GRAPH ═══ -->
+<meta property="og:type"        content="website">
+<meta property="og:locale"      content="fr_FR">
+<meta property="og:url"         content="https://dianesimulateur.netlify.app/">
+<meta property="og:title"       content="DIANE Simulateur — Simulation médicale haute-fidélité">
+<meta property="og:description" content="Simulation haute-fidélité de soins intensifs en navigateur. Réanimation, déchocage, SMUR — moniteurs temps réel, audio IEC 60601-1-8, 23 motifs cliniques. Gratuit.">
+<meta property="og:image"       content="https://dianesimulateur.netlify.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt"   content="Interface cockpit de DIANE Simulateur — monitoring multi-patients">
+<meta property="og:site_name"   content="DIANE Simulateur">
+
+<!-- ═══ TWITTER CARD ═══ -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="DIANE Simulateur — Simulation médicale haute-fidélité">
+<meta name="twitter:description" content="Simulation de soins intensifs en navigateur : réanimation, SMUR, déchocage. Moniteurs temps réel, audio IEC 60601-1-8, 23 motifs cliniques. Gratuit.">
+<meta name="twitter:image"       content="https://diane-simulateur.netlify.app/og-image.png">
+<meta name="twitter:image:alt"   content="Interface cockpit de DIANE Simulateur">
+
+<!-- ═══ DIVERS ═══ -->
+<meta name="theme-color" content="#060810">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23060810'/><text y='24' x='4' font-size='22'>♥</text></svg>">
+
+<!-- ═══ JSON-LD ═══ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DIANE Simulateur",
+  "url": "https://nbouteiller.itch.io/diane-simulateur",
+  "description": "Simulation haute-fidélité de soins intensifs pour navigateur : réanimation, déchocage, SMUR, régulation SAMU. Moniteurs patients en temps réel, moteur audio IEC 60601-1-8, 23 motifs cliniques.",
+  "applicationCategory": "EducationalApplication",
+  "applicationSubCategory": "MedicalSimulation",
+  "operatingSystem": "Any (Web Browser)",
+  "inLanguage": ["fr", "en"],
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "author": { "@type": "Person", "name": "Nicolas Bouteiller", "email": "nb.bouteiller@gmail.com" },
+  "keywords": "simulation médicale, réanimation, SMUR, soins intensifs, déchocage, moniteur patient, ECG, formation médicale",
+  "isAccessibleForFree": true,
+  "browserRequirements": "Requires JavaScript. Chrome, Firefox, Safari recommandés."
+}
+</script>
+
+<!-- ═══ POLICES ═══ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- ═══ TAILWIND CDN ═══ -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        syne: ['Syne', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      colors: {
+        ecg:   '#6fcf97',
+        pleth: '#7eb8d4',
+        capno: '#c8be8a',
+        mapa:  '#b093c8',
+        fr:    '#8ba4c8',
+        temp:  '#c8a47a',
+        alarm: '#c87878',
+        amb:   '#c8b870',
+      },
+      animation: {
+        'orb-a':    'orbA 30s ease-in-out infinite',
+        'orb-b':    'orbB 38s ease-in-out infinite',
+        'orb-c':    'orbC 34s ease-in-out infinite',
+        'grad':     'gradShift 6s ease infinite',
+        'pulse-btn':'subtlePulse 3s ease-in-out infinite',
+        'beat':     'heartbeat .83s ease-in-out infinite',
+        'blink':    'blink 1.2s ease-in-out infinite',
+        'alarm':    'alarmPulse .7s ease-in-out infinite',
+        'scan':     'scanLine 14s linear infinite',
+      },
+      keyframes: {
+        orbA:        { '0%,100%':{transform:'translate(0,0)'},'33%':{transform:'translate(4%,-5%) scale(1.04)'},'66%':{transform:'translate(-3%,3%) scale(.97)'} },
+        orbB:        { '0%,100%':{transform:'translate(0,0)'},'40%':{transform:'translate(-5%,4%) scale(1.05)'},'70%':{transform:'translate(4%,-3%) scale(.96)'} },
+        orbC:        { '0%,100%':{transform:'translate(0,0) scale(1.02)'},'50%':{transform:'translate(3%,4%) scale(.96)'} },
+        gradShift:   { '0%,100%':{backgroundPosition:'0% 50%'},'50%':{backgroundPosition:'100% 50%'} },
+        subtlePulse: { '0%,100%':{boxShadow:'0 4px 28px rgba(99,130,180,.28),0 0 0 1px rgba(99,130,180,.2)'},'50%':{boxShadow:'0 4px 40px rgba(99,130,180,.44),0 0 0 1px rgba(99,130,180,.34)'} },
+        heartbeat:   { '0%,100%':{transform:'scale(1)'},'15%':{transform:'scale(1.22)'},'30%':{transform:'scale(1)'},'45%':{transform:'scale(1.12)'},'60%':{transform:'scale(1)'} },
+        blink:       { '0%,100%':{opacity:'1'},'50%':{opacity:'.2'} },
+        alarmPulse:  { '0%,100%':{opacity:'1'},'50%':{opacity:'.3'} },
+        scanLine:    { '0%':{top:'-2px',opacity:'0'},'5%':{opacity:'1'},'95%':{opacity:'.3'},'100%':{top:'100%',opacity:'0'} },
+      },
+    }
+  }
+}
+</script>
+
+<style>
+  /* ── CSS Variables ─────────────────────────────────── */
+  :root {
+    --c-ecg:   #6fcf97;
+    --c-pleth: #7eb8d4;
+    --c-capno: #c8be8a;
+    --c-pa:    #b093c8;
+    --c-fr:    #8ba4c8;
+    --c-temp:  #c8a47a;
+    --c-alarm: #c87878;
+    --c-amb:   #c8b870;
+    --c-bg:    #060810;
+    --c-surface: rgba(255,255,255,.035);
+    --c-border:  rgba(255,255,255,.075);
+    --c-text:    rgba(255,255,255,.88);
+    --c-text-dim: rgba(255,255,255,.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--c-bg); font-family: 'Syne', sans-serif; color: var(--c-text); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: rgba(148,163,184,.2); border-radius: 2px; }
+
+  /* ── Gradient text ─────────────────────────────────── */
+  .grad-text {
+    background: linear-gradient(135deg, #94a3b8 0%, #e2e8f0 45%, #7aa3c8 100%);
+    background-size: 220%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradShift 6s ease infinite;
+  }
+
+  /* ── Glass card ────────────────────────────────────── */
+  .glass {
+    position: relative;
+    overflow: hidden;
+    background: var(--c-surface);
+    backdrop-filter: blur(28px) saturate(1.4);
+    border: 1px solid var(--c-border);
+    border-radius: 20px;
+    transition: all .4s cubic-bezier(.16,1,.3,1);
+    will-change: transform;
+    --mx: -200px; --my: -200px;
+  }
+  /* Spotlight radial gradient follows cursor */
+  .glass::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(280px circle at var(--mx) var(--my), rgba(148,163,184,.08), transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .35s ease;
+    z-index: 0;
+  }
+  .glass:hover::before { opacity: 1; }
+  .glass > * { position: relative; z-index: 1; }
+  .glass:hover {
+    background: rgba(255,255,255,.055);
+    border-color: rgba(148,163,184,.18);
+    transform: translateY(-4px);
+    box-shadow: 0 28px 72px rgba(0,0,0,.6);
+  }
+
+  /* ── Info card ─────────────────────────────────────── */
+  .info-card {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 18px;
+    padding: 32px 36px;
+  }
+
+  /* ── CTA button ────────────────────────────────────── */
+  .btn-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 17px 40px;
+    background: linear-gradient(135deg, rgba(71,107,155,.95), rgba(99,120,175,.95));
+    border: 1px solid rgba(148,163,184,.25);
+    border-radius: 10px;
+    color: rgba(255,255,255,.95);
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    text-decoration: none; letter-spacing: .03em;
+    animation: subtlePulse 3s ease-in-out infinite;
+    transition: all .25s ease;
+  }
+  .btn-cta:hover {
+    transform: translateY(-2px); animation: none;
+    background: linear-gradient(135deg, rgba(90,127,180,.98), rgba(118,140,200,.98));
+    box-shadow: 0 12px 40px rgba(71,107,155,.45);
+  }
+
+  /* ── Ghost button ──────────────────────────────────── */
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 15px 28px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,.65);
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600;
+    text-decoration: none; transition: all .25s ease;
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,.07);
+    border-color: rgba(148,163,184,.25);
+    color: rgba(255,255,255,.9);
+    transform: translateY(-2px);
+  }
+
+  /* ── Badge ─────────────────────────────────────────── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 13px; border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  }
+
+  /* ── Vitals Strip ──────────────────────────────────── */
+  .vitals-strip {
+    display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+    padding: 18px 32px;
+    background: rgba(0,0,0,.42);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.06);
+    margin-bottom: 48px;
+  }
+  .vital-item { text-align: center; }
+  .vital-label {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 8px; letter-spacing: .1em; margin-bottom: 4px;
+  }
+  .vital-val {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 21px; line-height: 1;
+  }
+  .vital-unit { font-family: 'JetBrains Mono', monospace; font-size: 8px; margin-top: 4px; opacity: .27; }
+  .vital-ecg   { color: var(--c-ecg);   }
+  .vital-pleth { color: var(--c-pleth); }
+  .vital-pa    { color: var(--c-pa);    }
+  .vital-capno { color: var(--c-capno); }
+  .vital-fr    { color: var(--c-fr);    }
+  .vital-temp  { color: var(--c-temp);  }
+  .vital-alarm { color: var(--c-alarm); }
+  .vital-amb   { color: var(--c-amb);   }
+
+  /* ── Scroll Reveal ─────────────────────────────────── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+    filter: blur(6px);
+    transition:
+      opacity   .9s cubic-bezier(.16,1,.3,1),
+      transform .9s cubic-bezier(.16,1,.3,1),
+      filter    .9s cubic-bezier(.16,1,.3,1);
+  }
+  .fade-up.visible { opacity: 1; transform: none; filter: blur(0); }
+
+  .reveal-words .word { display: inline-block; overflow: hidden; vertical-align: bottom; line-height: inherit; }
+  .reveal-words .word-inner {
+    display: inline-block;
+    transform: translateY(110%) rotate(2deg);
+    opacity: 0; filter: blur(4px);
+    transition:
+      transform .72s cubic-bezier(.16,1,.3,1),
+      opacity   .72s cubic-bezier(.16,1,.3,1),
+      filter    .55s cubic-bezier(.16,1,.3,1);
+    will-change: transform, opacity;
+  }
+  .reveal-words.visible .word-inner { transform: none; opacity: 1; filter: blur(0); }
+
+  .reveal-lines { overflow: hidden; }
+  .reveal-lines .line-inner {
+    display: block;
+    transform: translateY(100%); opacity: 0;
+    transition: transform .7s cubic-bezier(.16,1,.3,1), opacity .7s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal-lines.visible .line-inner { transform: none; opacity: 1; }
+
+  /* ── Background layers ─────────────────────────────── */
+  /* Particle canvas — sits above bg orbs, below content */
+  #particle-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+  .noise {
+    position: fixed; inset: 0; opacity: .025; pointer-events: none; z-index: 2;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .scan { position: fixed; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(148,163,184,.16), transparent); z-index: 4; pointer-events: none; animation: scanLine 14s linear infinite; }
+  .orb  { position: absolute; border-radius: 50%; filter: blur(110px); pointer-events: none; }
+
+  /* ── Mail link ─────────────────────────────────────── */
+  a.ml { color: var(--c-fr); text-decoration: none; border-bottom: 1px solid rgba(139,164,200,.3); padding-bottom: 1px; transition: all .2s; }
+  a.ml:hover { color: #a8c4e0; border-color: rgba(168,196,224,.5); }
+
+  /* ── Canvas ────────────────────────────────────────── */
+  canvas { display: block; background: #010203; }
+
+  /* ── Ko-fi ─────────────────────────────────────────── */
+  .kofi-section { display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; }
+  .kofi-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 13px 26px;
+    background: rgba(255,255,255,.045);
+    backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    color: var(--c-text);
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    text-decoration: none; letter-spacing: .02em;
+    white-space: nowrap;
+    animation: kofiPulse 1.5s ease-in-out infinite;
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  .kofi-btn:hover {
+    background: rgba(255,255,255,.08);
+    border-color: rgba(255,149,80,.35);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(255,120,60,.18);
+    animation: none;
+  }
+  .kofi-btn .kofi-icon { font-size: 18px; display: inline-block; }
+  @keyframes kofiPulse {
+    0%,100% { transform: scale(1.0);   box-shadow: 0 4px 24px rgba(255,120,60,.08), 0 0 0 1px rgba(255,255,255,.07); }
+    50%      { transform: scale(1.05);  box-shadow: 0 6px 32px rgba(255,120,60,.18), 0 0 0 1px rgba(255,255,255,.13); }
+  }
+
+  /* ── Play Now section ──────────────────────────────── */
+  .play-wrapper {
+    aspect-ratio: 16 / 9;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(111,207,151,.18),
+      0 0 32px 4px rgba(111,207,151,.18),
+      0 0 72px 16px rgba(99,130,180,.18),
+      0 0 140px 40px rgba(71,107,155,.12);
+    transition: box-shadow .4s ease;
+  }
+  .play-wrapper:hover {
+    box-shadow:
+      0 0 0 1px rgba(111,207,151,.32),
+      0 0 40px 8px rgba(111,207,151,.28),
+      0 0 90px 24px rgba(99,130,180,.28),
+      0 0 180px 56px rgba(71,107,155,.18);
+  }
+  .play-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
+
+  /* Fullscreen native */
+  .play-wrapper:-webkit-full-screen { width:100vw; height:100vh; aspect-ratio:unset; border-radius:0; }
+  .play-wrapper:-moz-full-screen    { width:100vw; height:100vh; aspect-ratio:unset; border-radius:0; }
+  .play-wrapper:fullscreen          { width:100vw; height:100vh; aspect-ratio:unset; border-radius:0; background:#000; }
+  .play-wrapper:fullscreen iframe   { position:absolute; inset:0; width:100%; height:100%; }
+
+  /* Bouton plein écran flottant */
+  .btn-fullscreen {
+    position: absolute; bottom: 12px; right: 12px; z-index: 10;
+    display: none; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: rgba(6,8,16,.72);
+    border: 1px solid rgba(148,185,220,.28);
+    border-radius: 8px;
+    color: rgba(200,220,240,.8);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    cursor: pointer; letter-spacing: .04em;
+    backdrop-filter: blur(8px);
+    transition: all .2s ease;
+  }
+  .btn-fullscreen:hover { background: rgba(71,107,155,.55); border-color: rgba(148,185,220,.5); color: #fff; }
+  .btn-fullscreen.visible { display: inline-flex; }
+
+  /* Play placeholder */
+  .play-placeholder {
+    position: absolute; inset: 0;
+    background-color: #050709;
+    background-image: url('og-image.png');
+    background-size: cover;
+    background-position: center;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .play-placeholder::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(5,7,14,.72);
+    backdrop-filter: blur(12px) saturate(1.2);
+  }
+
+  /* Launch button — effet magnétique 2D géré en JS */
+  .btn-launch {
+    position: relative; z-index: 1;
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 20px 48px;
+    background: linear-gradient(135deg, rgba(71,107,155,.95), rgba(99,140,190,.95));
+    border: 1px solid rgba(148,185,220,.35);
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700;
+    letter-spacing: .04em; text-shadow: 0 1px 8px rgba(0,0,0,.5);
+    box-shadow: 0 4px 32px rgba(71,107,155,.45), 0 0 0 1px rgba(148,185,220,.15);
+    transition: transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s ease, background .25s ease;
+    cursor: pointer;
+    animation: subtlePulse 3s ease-in-out infinite;
+  }
+  .btn-launch:active { transform: scale(.97) !important; }
+  .btn-launch .play-icon { font-size: 20px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,255,255,.6)); }
+
+/* ── Veille Sanitaire SPF ──────────────────────────────── */
+@keyframes spfBlink {
+  0%,100% { opacity:1; box-shadow:0 0 8px #ff3b3b,0 0 14px rgba(255,59,59,.4); }
+  50%      { opacity:.25; box-shadow:none; }
+}
+@keyframes spfScan {
+  0%   { top:-2px; }
+  100% { top:100%; }
+}
+@keyframes spfSpin {
+  to { transform:rotate(360deg); }
+}
+@keyframes spfFadeIn {
+  from { opacity:0; transform:translateY(4px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.spf-kpi { transition: background .3s ease; }
+.spf-kpi:hover { background: rgba(255,255,255,0.03); }
+</style>
+</head>
+
+<body class="bg-[#060810]">
+
+<!-- ═══ PARTICLE CANVAS ═══ -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- ═══ BACKGROUND ORBS ═══ -->
+<div style="position:fixed;inset:0;background:var(--c-bg);z-index:0;overflow:hidden">
+  <div class="orb" style="width:68vw;height:68vw;top:-18%;left:-12%;background:radial-gradient(circle,rgba(50,80,140,.18) 0%,transparent 65%);animation:orbA 30s ease-in-out infinite"></div>
+  <div class="orb" style="width:52vw;height:52vw;top:28%;right:-16%;background:radial-gradient(circle,rgba(80,110,160,.12) 0%,transparent 65%);animation:orbB 38s ease-in-out infinite"></div>
+  <div class="orb" style="width:46vw;height:46vw;bottom:-12%;left:22%;background:radial-gradient(circle,rgba(40,65,115,.14) 0%,transparent 65%);animation:orbC 34s ease-in-out infinite"></div>
+</div>
+<div class="noise"></div>
+<div class="scan"></div>
+
+<div style="position:relative;z-index:3">
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav id="nav" aria-label="Navigation principale" class="fixed top-0 left-0 right-0 z-50 px-8 flex items-center justify-between transition-all duration-300" style="height:60px">
+  <div class="flex items-center gap-2">
+    <div class="w-2 h-2 rounded-full bg-ecg animate-blink" style="box-shadow:0 0 8px rgba(111,207,151,.53)"></div>
+    <span class="font-mono font-bold text-sm tracking-widest">DIANE <span class="text-white/40 font-medium">Simulateur</span></span>
+    <span class="font-mono text-[10px] text-white/20">v12</span>
+  </div>
+  <div class="flex gap-3 items-center">
+    <a href="encyclopedie.html" class="btn-ghost" style="padding:8px 16px;font-size:12px;gap:6px">📖 Encyclopédie</a>
+    <span class="badge" style="background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.14);color:rgba(200,215,230,.55)">🇫🇷 FR / EN</span>
+    <button onclick="openContactModal()" class="btn-cta" style="padding:9px 20px;font-size:13px;border:none;cursor:pointer">✉ Contact</button>
+  </div>
+</nav>
+
+<!-- ═══════════════ CONTACT MODAL ═══════════════ -->
+<div id="contact-modal" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div id="contact-backdrop" onclick="closeContactModal()" style="position:absolute;inset:0;background:rgba(6,8,16,.85);backdrop-filter:blur(12px)"></div>
+  <div style="position:relative;z-index:1;width:100%;max-width:520px;background:rgba(12,18,32,.96);border:1px solid rgba(148,163,184,.14);border-radius:24px;padding:44px 40px;box-shadow:0 40px 120px rgba(0,0,0,.8),0 0 0 1px rgba(148,163,184,.07)">
+    <button onclick="closeContactModal()" style="position:absolute;top:16px;right:18px;background:none;border:none;color:rgba(255,255,255,.3);font-size:20px;cursor:pointer;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">&#x2715;</button>
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--c-ecg);box-shadow:0 0 8px rgba(111,207,151,.53);animation:blink 1.2s ease-in-out infinite"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;color:rgba(200,220,230,.45);text-transform:uppercase">Contact</span>
+      </div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;color:rgba(255,255,255,.92);margin-bottom:6px">Envoyer un message</h2>
+      <p style="font-size:13px;color:rgba(255,255,255,.35);line-height:1.6">Une question, un retour sur le simulateur, une suggestion ?</p>
+    </div>
+    <div id="contact-form-wrap">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(200,215,230,.45);margin-bottom:7px;font-family:'JetBrains Mono',monospace">NOM</label>
+          <input id="cf-name" type="text" placeholder="Jean Dupont" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:rgba(255,255,255,.85);font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='rgba(148,163,184,.32)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'" />
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(200,215,230,.45);margin-bottom:7px;font-family:'JetBrains Mono',monospace">E-MAIL</label>
+          <input id="cf-email" type="email" placeholder="vous@exemple.fr" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:rgba(255,255,255,.85);font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='rgba(148,163,184,.32)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'" />
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(200,215,230,.45);margin-bottom:7px;font-family:'JetBrains Mono',monospace">SUJET</label>
+        <input id="cf-subject" type="text" placeholder="Question sur DIANE Simulateur" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:rgba(255,255,255,.85);font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='rgba(148,163,184,.32)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'" />
+      </div>
+      <div style="margin-bottom:24px">
+        <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(200,215,230,.45);margin-bottom:7px;font-family:'JetBrains Mono',monospace">MESSAGE</label>
+        <textarea id="cf-message" rows="5" placeholder="Votre message…" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:rgba(255,255,255,.85);font-family:'Syne',sans-serif;font-size:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .2s" onfocus="this.style.borderColor='rgba(148,163,184,.32)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'"></textarea>
+      </div>
+      <div id="cf-error" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(200,120,120,.08);border:1px solid rgba(200,120,120,.22);border-radius:8px;font-size:12px;color:#e8a0a0"></div>
+      <button onclick="submitContactForm()" id="cf-submit" style="width:100%;padding:15px;background:linear-gradient(135deg,rgba(71,107,155,.95),rgba(99,120,175,.95));border:1px solid rgba(148,163,184,.25);border-radius:10px;color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:.03em;cursor:pointer;transition:all .25s ease" onmouseover="this.style.background='linear-gradient(135deg,rgba(90,127,180,.98),rgba(118,140,200,.98))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(71,107,155,.95),rgba(99,120,175,.95))'">
+        Envoyer le message &#x2192;
+      </button>
+    </div>
+    <div id="contact-success" style="display:none;text-align:center;padding:24px 0">
+      <div style="font-size:48px;margin-bottom:16px;color:var(--c-ecg)">&#x2713;</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:rgba(255,255,255,.9);margin-bottom:8px">Message envoy&#233; !</h3>
+      <p style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.7">Merci pour votre message. Je vous r&#233;pondrai dans les meilleurs d&#233;lais.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<main id="main-content">
+<section aria-label="Présentation de DIANE Simulateur" class="min-h-screen flex flex-col items-center justify-center text-center px-8" style="padding-top:110px;padding-bottom:72px">
+
+  <div class="fade-up flex items-center gap-3 mb-6">
+    <div style="height:1px;width:36px;background:linear-gradient(to right,transparent,rgba(148,163,184,.28))"></div>
+    <span class="badge animate-beat" style="background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.18);color:rgba(200,215,230,.75)">♥ SIMULATION MÉDICALE IMMERSIVE</span>
+    <div style="height:1px;width:36px;background:linear-gradient(to left,transparent,rgba(148,163,184,.28))"></div>
+  </div>
+
+  <h1 class="fade-up" style="transition-delay:80ms;line-height:.9;letter-spacing:-.04em;margin-bottom:14px">
+    <span class="grad-text block font-syne font-extrabold" style="font-size:clamp(58px,12vw,140px)">DIANE</span>
+    <span class="font-syne font-semibold" style="font-size:clamp(22px,4.5vw,54px);color:rgba(255,255,255,.42);-webkit-text-fill-color:rgba(255,255,255,.42)">Simulateur</span>
+  </h1>
+
+  <p class="fade-up font-semibold" style="transition-delay:140ms;font-size:clamp(15px,1.9vw,19px);color:rgba(255,255,255,.4);max-width:600px;line-height:1.4;margin-bottom:9px">Simulation haute-fidélité de soins intensifs.</p>
+  <p class="fade-up font-semibold" style="transition-delay:180ms;font-size:clamp(13px,1.6vw,17px);color:rgba(255,255,255,.62);max-width:620px;line-height:1.4;margin-bottom:12px">Réanimation · Déchocage · Bloc · SMUR · Régulation SAMU</p>
+  <p class="fade-up" style="transition-delay:220ms;font-size:13px;color:rgba(255,255,255,.28);max-width:460px;margin-bottom:44px;line-height:1.82">Entraînez-vous sur les scénarios les plus critiques avec des moniteurs synthétisés en temps réel, un moteur audio IEC 60601-1-8, et plus de 23 motifs SMUR.</p>
+
+  <div class="fade-up flex gap-4 flex-wrap justify-center mb-14" style="transition-delay:280ms">
+    <a href="https://ko-fi.com/nicolasbouteiller" target="_blank" rel="noopener noreferrer" class="kofi-btn">
+      <span class="kofi-icon">☕</span> Soutenir le projet
+    </a>
+    <a href="#features" class="btn-ghost">Fonctionnalités ↓</a>
+  </div>
+
+  <!-- ═══════════════ VEILLE SANITAIRE SPF ═══════════════ -->
+  <div class="fade-up" style="transition-delay:310ms;width:100%;max-width:700px;margin:0 auto 44px auto;padding:0 12px">
+
+    <!-- Texte d'accroche -->
+    <p style="
+      font-family:'JetBrains Mono',monospace;
+      font-size:11.5px;
+      color:rgba(255,255,255,.38);
+      text-align:center;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+      line-height:1.7;
+    ">Le système de santé est sous tension permanente.<br>
+    Les données ci-dessous reflètent l'activité réelle des services d'urgence en France ces dernières 24h.</p>
+
+    <!-- Card principale -->
+    <div id="spf-card" style="
+      position:relative;
+      background:rgba(8,18,40,0.55);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border:1px solid rgba(148,185,220,0.18);
+      border-radius:14px;
+      overflow:hidden;
+      font-family:'JetBrains Mono',monospace;
+    ">
+
+      <!-- Scan line animée -->
+      <div id="spf-scan" style="
+        position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-radius:14px;
+      ">
+        <div style="
+          position:absolute;left:0;right:0;height:2px;
+          background:linear-gradient(90deg,transparent,rgba(0,255,180,0.12),transparent);
+          animation:spfScan 4s linear infinite;
+        "></div>
+      </div>
+
+      <!-- Header -->
+      <div style="
+        position:relative;z-index:1;
+        display:flex;align-items:center;justify-content:space-between;
+        padding:12px 18px 10px;
+        border-bottom:1px solid rgba(148,185,220,0.12);
+        background:rgba(0,0,0,0.2);
+      ">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00ff9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span style="font-size:11px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.85);text-transform:uppercase">Unité de Veille Sanitaire · SPF</span>
+        </div>
+        <!-- Live dot -->
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="spf-dot" style="
+            display:inline-block;width:7px;height:7px;border-radius:50%;
+            background:#ff3b3b;
+            box-shadow:0 0 6px #ff3b3b;
+            animation:spfBlink 1.2s ease-in-out infinite;
+          "></span>
+          <span style="font-size:9.5px;letter-spacing:.1em;color:rgba(255,100,100,.8);text-transform:uppercase">Live Data Sync</span>
+        </div>
+      </div>
+
+      <!-- Body — indicateurs -->
+      <div id="spf-body" style="
+        position:relative;z-index:1;
+        display:grid;grid-template-columns:repeat(3,1fr);
+        gap:0;
+      ">
+
+        <!-- Indicateur 1 : Passages -->
+        <div class="spf-kpi" style="
+          padding:18px 16px 16px;
+          border-right:1px solid rgba(148,185,220,0.1);
+        ">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,229,255,.6)">Passages</span>
+          </div>
+          <div id="spf-passages" style="font-size:28px;font-weight:700;color:#00e5ff;letter-spacing:-.02em;line-height:1;margin-bottom:5px">—</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.05em">passages / 24h (national)</div>
+        </div>
+
+        <!-- Indicateur 2 : Taux hospit -->
+        <div class="spf-kpi" style="
+          padding:18px 16px 16px;
+          border-right:1px solid rgba(148,185,220,0.1);
+        ">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffd600" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,214,0,.6)">Hospitalisation</span>
+          </div>
+          <div id="spf-hospit" style="font-size:28px;font-weight:700;color:#ffd600;letter-spacing:-.02em;line-height:1;margin-bottom:5px">—</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.05em">taux d'hospit. (indicateur gravité)</div>
+        </div>
+
+        <!-- Indicateur 3 : Tension -->
+        <div class="spf-kpi" style="padding:18px 16px 16px">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,107,53,.6)">Tension</span>
+          </div>
+          <div id="spf-tension" style="font-size:16px;font-weight:700;letter-spacing:.05em;line-height:1;margin-bottom:5px;color:#4caf50">—</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.05em">niveau de tension système</div>
+        </div>
+      </div>
+
+      <!-- État de chargement -->
+      <div id="spf-loading" style="
+        position:absolute;inset:0;z-index:10;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        background:rgba(8,18,40,0.85);
+        backdrop-filter:blur(4px);
+        gap:10px;border-radius:14px;
+      ">
+        <div style="
+          width:22px;height:22px;border-radius:50%;
+          border:2px solid rgba(0,229,255,.15);
+          border-top-color:#00e5ff;
+          animation:spfSpin 0.8s linear infinite;
+        "></div>
+        <span style="font-size:10px;letter-spacing:.12em;color:rgba(0,229,255,.5);text-transform:uppercase">Connexion API SPF…</span>
+      </div>
+
+      <!-- Footer -->
+      <div style="
+        position:relative;z-index:1;
+        display:flex;align-items:center;justify-content:space-between;
+        padding:9px 18px;
+        border-top:1px solid rgba(148,185,220,0.08);
+        background:rgba(0,0,0,0.15);
+      ">
+        <span id="spf-source" style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.05em">Source : Santé Publique France · data.gouv.fr</span>
+        <span id="spf-date" style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.05em">Mise à jour : —</span>
+      </div>
+
+    </div><!-- /spf-card -->
+  </div><!-- /veille sanitaire wrapper -->
+  <!-- ════════════════════════════════════════════════════ -->
+
+  <!-- Vitals strip — cleaned up with utility classes -->
+  <div class="vitals-strip fade-up" style="transition-delay:340ms">
+    <div class="vital-item">
+      <div class="vital-label vital-ecg" style="opacity:.55">FC</div>
+      <div class="vital-val vital-ecg">72</div>
+      <div class="vital-unit vital-ecg">bpm</div>
+    </div>
+    <div class="vital-item">
+      <div class="vital-label vital-pleth" style="opacity:.55">SpO₂</div>
+      <div class="vital-val vital-pleth">98</div>
+      <div class="vital-unit vital-pleth">%</div>
+    </div>
+    <div class="vital-item">
+      <div class="vital-label vital-pa" style="opacity:.55">PA</div>
+      <div class="vital-val vital-pa">125/78</div>
+      <div class="vital-unit vital-pa">mmHg</div>
+    </div>
+    <div class="vital-item">
+      <div class="vital-label vital-capno" style="opacity:.55">EtCO₂</div>
+      <div class="vital-val vital-capno">38</div>
+      <div class="vital-unit vital-capno">mmHg</div>
+    </div>
+    <div class="vital-item">
+      <div class="vital-label vital-fr" style="opacity:.55">FR</div>
+      <div class="vital-val vital-fr">16</div>
+      <div class="vital-unit vital-fr">/min</div>
+    </div>
+    <div class="vital-item">
+      <div class="vital-label vital-temp" style="opacity:.55">T°</div>
+      <div class="vital-val vital-temp">37.2</div>
+      <div class="vital-unit vital-temp">°C</div>
+    </div>
+  </div>
+
+  <!-- Hero ECG -->
+  <div class="fade-up w-full" style="transition-delay:400ms;max-width:840px;border-radius:12px;overflow:hidden;border:1px solid rgba(111,207,151,.1)">
+    <canvas id="ecg-hero" style="width:100%;height:76px"></canvas>
+  </div>
+</section>
+
+<!-- ═══════════════ PLAY NOW ═══════════════ -->
+<section aria-label="Lancer la simulation" class="px-8 pb-20 fade-up">
+  <div class="mx-auto" style="max-width:960px">
+
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-3 mb-4">
+        <div style="height:1px;width:32px;background:linear-gradient(to right,transparent,rgba(111,207,151,.32))"></div>
+        <span class="badge" style="background:rgba(111,207,151,.08);border:1px solid rgba(111,207,151,.22);color:var(--c-ecg)">▶ PLAY NOW</span>
+        <div style="height:1px;width:32px;background:linear-gradient(to left,transparent,rgba(111,207,151,.32))"></div>
+      </div>
+      <h2 class="font-syne font-bold mb-2" style="font-size:clamp(20px,2.8vw,30px);letter-spacing:-.025em">Jouer directement <span class="grad-text">dans le navigateur</span></h2>
+      <p style="font-size:13px;color:rgba(255,255,255,.32);line-height:1.7">Aucune installation requise · Fonctionne sous Chrome, Firefox, Safari</p>
+    </div>
+
+    <!-- Player frame — NE PAS MODIFIER CE BLOC -->
+    <div class="play-wrapper" id="play-wrapper">
+
+      <!-- Placeholder affiché par défaut -->
+      <div class="play-placeholder" id="play-placeholder">
+        <button class="btn-launch" onclick="launchSim()" aria-label="Lancer la simulation DIANE">
+          <span class="play-icon">&#x25B6;</span>
+          Lancer la simulation
+        </button>
+      </div>
+      <!-- L'iframe est injectée dynamiquement par launchSim() -->
+
+      <!-- Bouton plein écran flottant (apparaît après lancement) -->
+      <button class="btn-fullscreen" id="btn-fullscreen" onclick="toggleFullscreen()" aria-label="Plein écran">
+        &#x26F6;&nbsp;Plein écran
+      </button>
+
+    </div>
+
+    <p class="text-center mt-4" style="font-size:11px;color:rgba(255,255,255,.2);font-family:'JetBrains Mono',monospace">
+      Hébergé en local &nbsp;·&nbsp; Audio IEC 60601-1-8 &nbsp;·&nbsp; Recommandé en plein écran &nbsp;·&nbsp; Touche <kbd style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:1px 5px;border-radius:3px;font-size:10px">F11</kbd>
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════ STATS ═══════════════ -->
+<div class="fade-up px-8 pb-16">
+  <div class="grid grid-cols-4 mx-auto" style="max-width:960px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:16px;overflow:hidden">
+    <div class="text-center py-7 px-4" style="border-right:1px solid rgba(255,255,255,.05)">
+      <div class="font-mono font-bold text-[36px] leading-none mb-1 vital-pleth">23+</div>
+      <div class="text-[11px]" style="color:rgba(255,255,255,.33)">Motifs SMUR</div>
+    </div>
+    <div class="text-center py-7 px-4" style="border-right:1px solid rgba(255,255,255,.05)">
+      <div class="font-mono font-bold text-[36px] leading-none mb-1 vital-pa">10</div>
+      <div class="text-[11px]" style="color:rgba(255,255,255,.33)">Patients simultanés</div>
+    </div>
+    <div class="text-center py-7 px-4" style="border-right:1px solid rgba(255,255,255,.05)">
+      <div class="font-mono font-bold text-[36px] leading-none mb-1" style="color:#94a3b8">5</div>
+      <div class="text-[11px]" style="color:rgba(255,255,255,.33)">Thèmes visuels</div>
+    </div>
+    <div class="text-center py-7 px-4">
+      <div class="font-mono font-bold text-[18px] leading-snug mb-1 vital-ecg">IEC 60601</div>
+      <div class="text-[11px]" style="color:rgba(255,255,255,.33)">Audio normé</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ BENTO FEATURES ═══════════════ -->
+<section id="features" aria-label="Fonctionnalités" class="px-8 pb-20">
+  <div class="mx-auto" style="max-width:960px">
+    <div class="fade-up text-center mb-12">
+      <h2 class="font-syne font-extrabold mb-3" style="font-size:clamp(26px,4vw,44px);letter-spacing:-.03em">Fonctionnalités <span class="grad-text">haute-fidélité</span></h2>
+      <p class="text-[13px] mx-auto" style="color:rgba(255,255,255,.36);max-width:440px;line-height:1.65">Chaque composant est modélisé sur les systèmes médicaux réels utilisés en réanimation.</p>
+    </div>
+
+    <!-- Row 1 -->
+    <div class="grid gap-4 mb-4" style="grid-template-columns:7fr 5fr">
+
+      <!-- Waveforms card -->
+      <div class="glass fade-up flex flex-col gap-3 p-6" style="min-height:300px">
+        <div>
+          <span class="badge mb-2" style="background:rgba(111,207,151,.08);border:1px solid rgba(111,207,151,.2);color:var(--c-ecg)">📟 WAVEFORMS EN TEMPS RÉEL</span>
+          <h3 class="font-syne font-bold text-[19px] mb-1">Philips IntelliVue MP5</h3>
+          <p class="text-[13px]" style="color:rgba(255,255,255,.4);line-height:1.5">Synthèse phosphore CRT multicouche — ECG II, Plethysmographie, Capnographie EtCO₂ avec persistance visuelle authentique.</p>
+        </div>
+        <div class="flex flex-col gap-1 flex-1">
+          <div class="relative"><span class="font-mono absolute top-1 left-1.5 text-[7px] font-bold z-10" style="color:rgba(111,207,151,.38)">ECG II</span><canvas id="f-ecg" style="width:100%;height:54px;border-radius:5px"></canvas></div>
+          <div class="relative"><span class="font-mono absolute top-1 left-1.5 text-[7px] font-bold z-10" style="color:rgba(126,184,212,.38)">Pleth</span><canvas id="f-pleth" style="width:100%;height:42px;border-radius:5px"></canvas></div>
+          <div class="relative"><span class="font-mono absolute top-1 left-1.5 text-[7px] font-bold z-10" style="color:rgba(200,190,138,.38)">EtCO₂</span><canvas id="f-capno" style="width:100%;height:36px;border-radius:5px"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Audio card -->
+      <div class="glass fade-up flex flex-col gap-3 p-6" style="min-height:300px;transition-delay:80ms">
+        <div>
+          <span class="badge mb-2" style="background:rgba(139,164,200,.08);border:1px solid rgba(139,164,200,.2);color:var(--c-fr)">🔊 IEC 60601-1-8</span>
+          <h3 class="font-syne font-bold text-[18px] mb-1">Moteur Audio Certifié</h3>
+          <p class="text-[13px]" style="color:rgba(255,255,255,.4);line-height:1.5">Synthèse additive ADSR. Timbre Philips IntelliVue — pitch SpO₂ dynamique calibré Masimo.</p>
+        </div>
+        <div class="flex flex-col gap-1.5 flex-1 justify-end">
+          <div class="flex justify-between items-center px-3 py-2 rounded-lg" style="background:rgba(0,0,0,.35);border:1px solid rgba(126,184,212,.12)"><div><div class="text-[11px]" style="color:rgba(255,255,255,.58)">Pulse SpO₂</div><div class="font-mono text-[8px]" style="color:rgba(255,255,255,.26)">Pitch dynamique</div></div><span class="font-mono text-[11px] font-bold vital-pleth">820 Hz</span></div>
+          <div class="flex justify-between items-center px-3 py-2 rounded-lg" style="background:rgba(0,0,0,.35);border:1px solid rgba(200,120,120,.12)"><div><div class="text-[11px]" style="color:rgba(255,255,255,.58)">Alarme Rouge</div><div class="font-mono text-[8px]" style="color:rgba(255,255,255,.26)">IEC prio haute</div></div><span class="font-mono text-[11px] font-bold vital-alarm">C6 · ●●● ●●</span></div>
+          <div class="flex justify-between items-center px-3 py-2 rounded-lg" style="background:rgba(0,0,0,.35);border:1px solid rgba(200,184,112,.12)"><div><div class="text-[11px]" style="color:rgba(255,255,255,.58)">Alarme Jaune</div><div class="font-mono text-[8px]" style="color:rgba(255,255,255,.26)">Arpège Do Maj</div></div><span class="font-mono text-[11px] font-bold vital-amb">C5–E5–G5</span></div>
+          <div class="flex justify-between items-center px-3 py-2 rounded-lg" style="background:rgba(0,0,0,.35);border:1px solid rgba(139,164,200,.12)"><div><div class="text-[11px]" style="color:rgba(255,255,255,.58)">Appel SAMU</div><div class="font-mono text-[8px]" style="color:rgba(255,255,255,.26)">Mélodie urgence</div></div><span class="font-mono text-[11px] font-bold vital-fr">A4–C#5–A4</span></div>
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background:rgba(139,164,200,.06);border:1px solid rgba(139,164,200,.16)">
+            <span class="text-sm animate-beat inline-block">♥</span>
+            <span class="font-mono text-[10px] vital-fr">Synthèse additive · ADSR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: 4 small cards -->
+    <div class="grid grid-cols-4 gap-4">
+
+      <!-- Scenarios -->
+      <div class="glass fade-up p-5 flex flex-col gap-3" style="transition-delay:120ms">
+        <div>
+          <span class="badge mb-2" style="background:rgba(126,184,212,.08);border:1px solid rgba(126,184,212,.2);color:var(--c-pleth)">🚑 SMUR / SAMU</span>
+          <h3 class="font-syne font-bold text-[17px] mb-1">23 Motifs Cliniques</h3>
+          <p class="text-[12px]" style="color:rgba(255,255,255,.4);line-height:1.5">IDM · ACR · SEPSIS · AVC · TRAUMA · OAP · HTIC...</p>
+        </div>
+        <div class="flex flex-wrap gap-1">
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">IDM STEMI</span>
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">ACR FV</span>
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">SEPSIS</span>
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">AVC</span>
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">OAP</span>
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">HTIC</span>
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">INTOX</span>
+          <span class="font-mono text-[8px] font-bold px-2 py-1 rounded" style="background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.14);color:var(--c-pleth)">PNO</span>
+          <span class="font-mono text-[8px]" style="color:rgba(255,255,255,.28)">+ 15 autres</span>
+        </div>
+      </div>
+
+      <!-- Multi-patients -->
+      <div class="glass fade-up p-5 flex flex-col gap-3" style="transition-delay:160ms">
+        <div>
+          <span class="badge mb-2" style="background:rgba(176,147,200,.08);border:1px solid rgba(176,147,200,.2);color:var(--c-pa)">🏥 MULTI-PATIENTS</span>
+          <h3 class="font-syne font-bold text-[16px] mb-1">10 Patients</h3>
+          <p class="text-[12px]" style="color:rgba(255,255,255,.38);line-height:1.45">Vue cockpit · SOFA · IOT · CCMU</p>
+        </div>
+        <div class="flex gap-1.5 mt-auto">
+          <div class="flex-1 text-center py-2 rounded-lg" style="background:rgba(0,0,0,.5);border:1px solid rgba(111,207,151,.15)"><div class="font-mono font-bold text-base vital-ecg" style="line-height:1">72</div><div class="font-mono text-[6px] mt-1" style="color:rgba(255,255,255,.26)">bpm</div><div class="font-mono font-bold text-[10px] mt-1 vital-pleth">98</div><div class="font-mono text-[6px]" style="color:rgba(126,184,212,.4)">%</div></div>
+          <div class="flex-1 text-center py-2 rounded-lg" style="background:rgba(0,0,0,.5);border:1px solid rgba(200,120,120,.2)"><div class="font-mono font-bold text-base animate-alarm vital-alarm" style="line-height:1">—</div><div class="font-mono text-[6px] mt-1" style="color:rgba(255,255,255,.26)">bpm</div><div class="font-mono font-bold text-[9px] mt-1 vital-alarm">ACR</div></div>
+          <div class="flex-1 text-center py-2 rounded-lg" style="background:rgba(0,0,0,.5);border:1px solid rgba(200,184,112,.15)"><div class="font-mono font-bold text-base vital-amb" style="line-height:1">118</div><div class="font-mono text-[6px] mt-1" style="color:rgba(255,255,255,.26)">bpm</div><div class="font-mono font-bold text-[10px] mt-1 vital-pleth">91</div><div class="font-mono text-[6px]" style="color:rgba(126,184,212,.4)">%</div></div>
+        </div>
+      </div>
+
+      <!-- Themes -->
+      <div class="glass fade-up p-5 flex flex-col gap-3" style="transition-delay:200ms">
+        <div>
+          <span class="badge mb-2" style="background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2);color:#94a3b8">🎨 THÈMES</span>
+          <h3 class="font-syne font-bold text-[16px] mb-1">5 Thèmes macOS</h3>
+          <p class="text-[12px]" style="color:rgba(255,255,255,.38);line-height:1.45">Glassmorphism Tahoe</p>
+        </div>
+        <div class="flex flex-col gap-1.5 mt-auto">
+          <div class="flex items-center gap-2"><div class="w-6 h-3 rounded flex-shrink-0" style="background:linear-gradient(90deg,#007AFF,#30B0C7)"></div><span class="font-mono text-[10px]" style="color:rgba(255,255,255,.45)">Tahoe</span></div>
+          <div class="flex items-center gap-2"><div class="w-6 h-3 rounded flex-shrink-0" style="background:linear-gradient(90deg,#FF2D55,#AF52DE)"></div><span class="font-mono text-[10px]" style="color:rgba(255,255,255,.45)">Berry</span></div>
+          <div class="flex items-center gap-2"><div class="w-6 h-3 rounded flex-shrink-0" style="background:linear-gradient(90deg,#00C7BE,#34C759)"></div><span class="font-mono text-[10px]" style="color:rgba(255,255,255,.45)">Ocean</span></div>
+          <div class="flex items-center gap-2"><div class="w-6 h-3 rounded flex-shrink-0" style="background:linear-gradient(90deg,#FF9500,#FF3A2D)"></div><span class="font-mono text-[10px]" style="color:rgba(255,255,255,.45)">Sunset</span></div>
+          <div class="flex items-center gap-2"><div class="w-6 h-3 rounded flex-shrink-0" style="background:linear-gradient(90deg,#8E8E93,#636366)"></div><span class="font-mono text-[10px]" style="color:rgba(255,255,255,.45)">Graphite</span></div>
+        </div>
+      </div>
+
+      <!-- Scoring -->
+      <div class="glass fade-up p-5 flex flex-col gap-3" style="transition-delay:240ms">
+        <div>
+          <span class="badge mb-2" style="background:rgba(200,164,122,.08);border:1px solid rgba(200,164,122,.2);color:var(--c-temp)">🧬 SCORING</span>
+          <h3 class="font-syne font-bold text-[16px] mb-1">Scoring Clinique</h3>
+          <p class="text-[12px]" style="color:rgba(255,255,255,.38);line-height:1.45">SOFA · RASS · GCS · P/F</p>
+        </div>
+        <div class="flex flex-col gap-1.5 mt-auto">
+          <div class="flex justify-between items-center px-2.5 py-1.5 rounded-md" style="background:rgba(0,0,0,.35);border:1px solid rgba(200,164,122,.15)"><span class="text-[10px] font-semibold" style="color:rgba(255,255,255,.52)">SOFA</span><span class="font-mono font-bold text-[15px] vital-temp">12/24</span></div>
+          <div class="flex justify-between items-center px-2.5 py-1.5 rounded-md" style="background:rgba(0,0,0,.35);border:1px solid rgba(176,147,200,.15)"><span class="text-[10px] font-semibold" style="color:rgba(255,255,255,.52)">RASS</span><span class="font-mono font-bold text-[15px] vital-pa">−4</span></div>
+          <div class="flex justify-between items-center px-2.5 py-1.5 rounded-md" style="background:rgba(0,0,0,.35);border:1px solid rgba(200,120,120,.15)"><span class="text-[10px] font-semibold" style="color:rgba(255,255,255,.52)">P/F ratio</span><span class="font-mono font-bold text-[15px] vital-alarm">148</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ COCKPIT PREVIEW ═══════════════ -->
+<section id="preview" aria-label="Aperçu de l'interface" class="px-8 pb-20">
+  <div class="mx-auto" style="max-width:860px">
+    <div class="fade-up text-center mb-10">
+      <h2 class="font-syne font-extrabold mb-2.5" style="font-size:clamp(24px,3.8vw,42px);letter-spacing:-.03em">L'interface <span class="grad-text">cockpit</span></h2>
+      <p class="text-[13px] mx-auto" style="color:rgba(255,255,255,.36);max-width:400px">Un poste de réanimation entièrement simulé dans votre navigateur — sans installation.</p>
+    </div>
+    <div class="fade-up" style="transition-delay:100ms;border-radius:18px;overflow:hidden;box-shadow:0 0 0 1px rgba(148,163,184,.12),0 36px 90px rgba(0,0,0,.72)">
+      <div class="font-mono" style="background:#080d12;border-radius:16px;padding:16px">
+        <!-- Monitor header -->
+        <div class="flex justify-between items-center mb-3 pb-2.5" style="border-bottom:1px solid rgba(255,255,255,.07)">
+          <div class="flex items-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full animate-blink" style="background:var(--c-ecg)"></div>
+            <span class="text-[12px] font-bold tracking-widest" style="color:rgba(255,255,255,.82)">DIANE Simulateur</span>
+            <span class="text-[7px]" style="color:rgba(255,255,255,.26)">RÉA · DECHOC · SAMU — v12</span>
+          </div>
+          <div class="flex gap-1">
+            <span class="text-[7px] px-2 py-0.5 rounded" style="background:rgba(0,122,255,.2);color:#60a5fa;border:1px solid rgba(0,122,255,.3)">TAHOE</span>
+            <span class="text-[7px] px-2 py-0.5 rounded" style="background:rgba(255,255,255,.04);color:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.06)">BERRY</span>
+          </div>
+        </div>
+        <!-- Monitor body -->
+        <div class="grid gap-3" style="grid-template-columns:1fr 180px">
+          <!-- Left: waveforms + numerics -->
+          <div class="flex flex-col gap-1.5">
+            <div class="p-2 rounded-lg" style="background:#010203;border:1px solid rgba(255,255,255,.06)">
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="text-[7px] font-bold" style="color:rgba(111,207,151,.55)">II</span>
+                <span class="font-mono font-bold text-sm vital-ecg">72</span>
+                <span class="text-[7px]" style="color:rgba(111,207,151,.38)">bpm</span>
+                <div class="ml-auto w-1.5 h-1.5 rounded-full animate-beat" style="background:var(--c-ecg)"></div>
+              </div>
+              <canvas id="m-ecg" style="width:100%;height:48px;border-radius:3px"></canvas>
+              <canvas id="m-pleth" class="mt-1" style="width:100%;height:36px;border-radius:3px"></canvas>
+              <canvas id="m-capno" class="mt-1" style="width:100%;height:30px;border-radius:3px"></canvas>
+            </div>
+            <div class="grid grid-cols-5 gap-1">
+              <div class="text-center py-1.5 rounded" style="background:rgba(0,0,0,.5);border:1px solid rgba(111,207,151,.15)"><div class="font-mono text-[6px] font-bold" style="color:rgba(111,207,151,.55)">FC</div><div class="font-mono font-bold text-[15px] vital-ecg" style="line-height:1.1">72</div><div class="font-mono text-[6px]" style="color:rgba(111,207,151,.4)">bpm</div></div>
+              <div class="text-center py-1.5 rounded" style="background:rgba(0,0,0,.5);border:1px solid rgba(126,184,212,.15)"><div class="font-mono text-[6px] font-bold" style="color:rgba(126,184,212,.55)">SpO₂</div><div class="font-mono font-bold text-[15px] vital-pleth" style="line-height:1.1">98</div><div class="font-mono text-[6px]" style="color:rgba(126,184,212,.4)">%</div></div>
+              <div class="text-center py-1.5 rounded" style="background:rgba(0,0,0,.5);border:1px solid rgba(176,147,200,.15)"><div class="font-mono text-[6px] font-bold" style="color:rgba(176,147,200,.55)">PAS</div><div class="font-mono font-bold text-[15px] vital-pa" style="line-height:1.1">125</div><div class="font-mono text-[6px]" style="color:rgba(176,147,200,.4)">mmHg</div></div>
+              <div class="text-center py-1.5 rounded" style="background:rgba(0,0,0,.5);border:1px solid rgba(200,190,138,.15)"><div class="font-mono text-[6px] font-bold" style="color:rgba(200,190,138,.55)">CO₂</div><div class="font-mono font-bold text-[15px] vital-capno" style="line-height:1.1">38</div><div class="font-mono text-[6px]" style="color:rgba(200,190,138,.4)">mm</div></div>
+              <div class="text-center py-1.5 rounded" style="background:rgba(0,0,0,.5);border:1px solid rgba(139,164,200,.15)"><div class="font-mono text-[6px] font-bold" style="color:rgba(139,164,200,.55)">FR</div><div class="font-mono font-bold text-[15px] vital-fr" style="line-height:1.1">16</div><div class="font-mono text-[6px]" style="color:rgba(139,164,200,.4)">/min</div></div>
+            </div>
+          </div>
+          <!-- Right: patients + triage -->
+          <div class="flex flex-col gap-1.5">
+            <div class="p-2.5 rounded-lg flex-1" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
+              <div class="font-mono text-[7px] font-bold tracking-widest mb-2" style="color:rgba(255,255,255,.28)">PATIENTS ACTIFS</div>
+              <div class="px-2 py-1.5 rounded mb-1" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)"><div class="text-[8px] font-bold vital-ecg">Pt.1 — IDM STEMI</div><div class="text-[6px] mt-0.5" style="color:rgba(255,255,255,.28)">CCMU 5 · FC 72 · SpO₂ 98%</div></div>
+              <div class="px-2 py-1.5 rounded mb-1" style="background:rgba(239,68,68,.1);border:1px solid rgba(200,120,120,.26)"><div class="flex justify-between"><span class="text-[8px] font-bold vital-alarm">Pt.2 — ACR FV</span><span class="text-[7px] font-bold animate-alarm vital-alarm">ACR!</span></div><div class="text-[6px] mt-0.5" style="color:rgba(255,255,255,.28)">CCMU 5 · FC — · SpO₂ —%</div></div>
+              <div class="px-2 py-1.5 rounded" style="background:rgba(200,184,112,.07);border:1px solid rgba(200,184,112,.18)"><div class="text-[8px] font-bold vital-amb">Pt.3 — SEPSIS</div><div class="text-[6px] mt-0.5" style="color:rgba(255,255,255,.28)">CCMU 4 · FC 118 · SpO₂ 91%</div></div>
+            </div>
+            <div class="p-2.5 rounded-lg flex-1" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
+              <div class="font-mono text-[7px] font-bold tracking-widest mb-1.5" style="color:rgba(255,255,255,.28)">CCMU TRIAGE</div>
+              <div class="flex justify-between items-center mb-1 px-1.5 py-1 rounded" style="background:rgba(200,120,120,.07);border:1px solid rgba(200,120,120,.16)"><span class="text-[8px] font-bold vital-alarm">CCMU 5</span><span class="text-[6px]" style="color:rgba(255,255,255,.26)">Pronostic vital</span></div>
+              <div class="flex justify-between items-center mb-1 px-1.5 py-1 rounded" style="background:rgba(200,164,122,.07);border:1px solid rgba(200,164,122,.16)"><span class="text-[8px] font-bold vital-temp">CCMU 4</span><span class="text-[6px]" style="color:rgba(255,255,255,.26)">Urgence vraie</span></div>
+              <div class="flex justify-between items-center mb-1 px-1.5 py-1 rounded" style="background:rgba(200,190,138,.07);border:1px solid rgba(200,190,138,.16)"><span class="text-[8px] font-bold vital-capno">CCMU 3</span><span class="text-[6px]" style="color:rgba(255,255,255,.26)">Urgence</span></div>
+              <div class="flex justify-between items-center px-1.5 py-1 rounded" style="background:rgba(139,164,200,.07);border:1px solid rgba(139,164,200,.16)"><span class="text-[8px] font-bold vital-fr">CCMU 2</span><span class="text-[6px]" style="color:rgba(255,255,255,.26)">Relative</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DISCLAIMER ═══════════════ -->
+<section aria-label="Avertissement médical" class="px-8 pb-6">
+  <div class="fade-up info-card mx-auto" style="max-width:860px;border-left:3px solid rgba(200,164,122,.38)">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-[22px]">⚠️</span>
+      <h3 class="font-syne font-bold text-[17px]" style="color:rgba(255,255,255,.8)">Avertissement important</h3>
+    </div>
+    <p class="text-[14px] mb-3" style="color:rgba(255,255,255,.48);line-height:1.88"><strong style="color:rgba(255,255,255,.7)">DIANE Simulateur</strong> est un projet de simulation à vocation pédagogique et récréative. Malgré son réalisme visuel et sonore, il ne s'agit <strong style="color:var(--c-temp)">en aucun cas</strong> d'un dispositif médical homologué.</p>
+    <p class="text-[14px] mb-4" style="color:rgba(255,255,255,.48);line-height:1.88">Son auteur <strong style="color:rgba(255,255,255,.62)">n'est pas médecin</strong>. Les valeurs physiologiques, les protocoles et les recommandations affichées sont basés sur des sources publiques et peuvent comporter des erreurs ou des approximations.</p>
+    <div class="p-4 rounded-xl" style="background:rgba(200,120,120,.07);border:1px solid rgba(200,120,120,.2)">
+      <p class="text-[13px] font-semibold" style="color:var(--c-alarm);line-height:1.75">🚫 Cette simulation ne doit jamais être utilisée à des fins médicales, diagnostiques ou thérapeutiques réelles.<br>En cas d'urgence médicale, composez le <strong>15 (SAMU)</strong> ou le <strong>112</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ WIP + CONTACT ═══════════════ -->
+<section aria-label="Développement et contact" class="px-8 pb-20">
+  <div class="fade-up info-card mx-auto" style="max-width:860px;border-left:3px solid rgba(126,184,212,.38)">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-[22px]">🛠️</span>
+      <h3 class="font-syne font-bold text-[17px]" style="color:rgba(255,255,255,.8)">Projet en cours de développement</h3>
+    </div>
+    <p class="text-[14px] mb-3" style="color:rgba(255,255,255,.48);line-height:1.88">DIANE Simulateur est un projet <strong style="color:rgba(255,255,255,.65)">en constante évolution</strong>. De nouvelles fonctionnalités, scénarios et améliorations sont ajoutés régulièrement.</p>
+    <p class="text-[14px] mb-6" style="color:rgba(255,255,255,.48);line-height:1.88">Toutes les <strong style="color:var(--c-pleth)">suggestions d'améliorations</strong>, retours d'expérience, critiques constructives ou rapports de bugs sont les bienvenus. Le <strong style="color:rgba(255,255,255,.65)">code source complet</strong> peut être fourni à quiconque le souhaite sur simple demande par email.</p>
+    <div class="flex gap-4 flex-wrap">
+      <div class="flex-1 flex items-center gap-3 p-4 rounded-xl" style="min-width:220px;background:rgba(126,184,212,.07);border:1px solid rgba(126,184,212,.18)">
+        <span class="text-[20px] flex-shrink-0">✉️</span>
+        <div>
+          <div class="text-[11px] mb-1 tracking-wide" style="color:rgba(255,255,255,.35)">Contactez-moi</div>
+          <a href="/cdn-cgi/l/email-protection#701e125e121f050415191c1c150230171d11191c5e131f1d" class="ml font-mono font-bold text-[14px]"><span class="__cf_email__" data-cfemail="214f430f434e545544484d4d445361464c40484d0f424e4c">[email&#160;protected]</span></a>
+        </div>
+      </div>
+      <div class="flex-1 p-4 rounded-xl" style="min-width:220px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)">
+        <div class="text-[11px] mb-2.5 tracking-wide" style="color:rgba(255,255,255,.3)">Développé avec l'aide de</div>
+        <div class="flex gap-2 flex-wrap">
+          <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" class="text-[12px] font-bold px-3 py-1 rounded-lg" style="background:rgba(255,149,0,.09);border:1px solid rgba(255,149,0,.2);color:#e8a855;text-decoration:none;transition:all .2s ease" onmouseover="this.style.background='rgba(255,149,0,.16)'" onmouseout="this.style.background='rgba(255,149,0,.09)'">Claude (Anthropic)</a>
+          <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="text-[12px] font-bold px-3 py-1 rounded-lg" style="background:rgba(66,133,244,.09);border:1px solid rgba(66,133,244,.2);color:#7aabef;text-decoration:none;transition:all .2s ease" onmouseover="this.style.background='rgba(66,133,244,.16)'" onmouseout="this.style.background='rgba(66,133,244,.09)'">Google AI Studio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CTA FINAL ═══════════════ -->
+<section aria-label="Appel à l'action" class="px-8 pb-24">
+  <div class="fade-up text-center mx-auto p-12 relative overflow-hidden" style="max-width:620px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:26px">
+    <div style="position:absolute;inset:-1px;border-radius:27px;background:linear-gradient(135deg,rgba(71,107,155,.22),rgba(148,163,184,.1),rgba(71,107,155,.22));background-size:200%;animation:gradShift 7s ease infinite;z-index:-1"></div>
+    <div class="text-[42px] mb-4 inline-block animate-beat">♥</div>
+    <h2 class="font-syne font-extrabold mb-3" style="font-size:clamp(24px,4vw,38px);letter-spacing:-.03em">Prêt à sauver des vies ?</h2>
+    <p class="text-[14px] mb-8 mx-auto" style="color:rgba(255,255,255,.36);line-height:1.75;max-width:360px">Accès gratuit et immédiat. Fonctionne dans tout navigateur moderne — Chrome, Firefox, Safari.</p>
+    <a href="https://nbouteiller.itch.io/diane-simulateur" rel="noopener noreferrer" class="btn-cta" style="font-size:16px;padding:17px 44px">▶ Jouer sur itch.io — Gratuit</a>
+  </div>
+</section><!-- /CTA -->
+</main>
+
+<!-- ═══════════════ SECTION SEO ═══════════════ -->
+<section aria-label="À propos de DIANE Simulateur" class="px-8 pb-16">
+  <div class="mx-auto text-center" style="max-width:760px">
+    <h2 class="font-syne font-bold mb-4" style="font-size:clamp(22px,3.2vw,34px);letter-spacing:-.025em">La simulation médicale la plus réaliste <span class="grad-text">de votre navigateur</span></h2>
+    <p class="mb-4" style="font-size:15px;color:rgba(255,255,255,.45);line-height:1.9"><strong style="color:rgba(255,255,255,.7)">DIANE Simulateur</strong> est un logiciel de simulation médicale haute-fidélité conçu pour fonctionner entièrement dans le navigateur, sans installation ni serveur. Il reproduit l'environnement d'un service de réanimation, d'un déchocage, d'un bloc opératoire et d'une régulation SAMU.</p>
+    <p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.9">Les tracés ECG, pléthysmographie et capnographie EtCO₂ sont synthétisés via le moteur phosphore Canvas, fidèle aux moniteurs <strong style="color:rgba(255,255,255,.45)">Philips IntelliVue MP5</strong>. Le moteur audio respecte la norme <strong style="color:rgba(255,255,255,.45)">IEC 60601-1-8</strong> avec synthèse additive ADSR pour les alarmes haute et moyenne priorité ainsi que le pulse SpO₂ à pitch dynamique. Les <strong style="color:rgba(255,255,255,.45)">23 motifs SMUR</strong> couvrent : IDM STEMI, arrêt cardiaque (FV, asystolie), sepsis sévère, AVC ischémique et hémorragique, polytraumatisme, OAP cardiogénique, intoxications médicamenteuses, HTIC, pneumothorax, choc anaphylactique et bien d'autres. Les scores cliniques <strong style="color:rgba(255,255,255,.45)">SOFA, RASS, GCS, ratio P/F</strong> et la balance hydrique sont calculés dynamiquement avec des conséquences thérapeutiques réalistes.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ KO-FI ═══════════════ -->
+<section aria-label="Soutenir le projet" class="px-8 pb-14 fade-up">
+  <div class="mx-auto" style="max-width:860px">
+    <div style="height:1px;background:rgba(255,255,255,.05);margin-bottom:40px"></div>
+    <div class="kofi-section">
+      <a href="https://ko-fi.com/nicolasbouteiller" target="_blank" rel="noopener noreferrer" class="kofi-btn">
+        <span class="kofi-icon">☕</span>
+        Offrir un café
+      </a>
+      <p class="text-center" style="font-size:13px;color:rgba(255,255,255,.38);line-height:1.85;max-width:480px">
+        <span style="color:rgba(255,255,255,.58);font-weight:600;">DIANE</span> est un projet indépendant et bénévole.
+        Si ce simulateur vous est utile, vous pouvez soutenir son évolution en m'offrant un café&nbsp;!
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer aria-label="Pied de page" class="px-8 py-8" style="border-top:1px solid rgba(255,255,255,.05)">
+  <div class="mx-auto" style="max-width:860px">
+    <div class="flex justify-between flex-wrap gap-6 mb-6">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-1.5 h-1.5 rounded-full animate-blink" style="background:var(--c-ecg)"></div>
+          <span class="font-mono font-bold text-[13px] tracking-widest" style="color:rgba(255,255,255,.52)">DIANE Simulateur</span>
+          <span class="font-mono text-[9px]" style="color:rgba(255,255,255,.2)">v12</span>
+        </div>
+        <p class="text-[12px]" style="color:rgba(255,255,255,.26);line-height:1.65;max-width:280px">Simulation médicale haute-fidélité pour navigateur.<br>Projet personnel non commercial, en cours de développement.</p>
+      </div>
+      <div class="flex flex-col gap-2 items-end">
+        <div class="text-right">
+          <div class="font-syne font-bold text-[15px]" style="color:rgba(255,255,255,.65);letter-spacing:.02em">Nicolas <span style="color:rgba(255,255,255,.88)">BOUTEILLER</span></div>
+          <div class="text-[11px] mt-0.5" style="color:rgba(255,255,255,.28)">Auteur · Développeur</div>
+        </div>
+        <a href="/cdn-cgi/l/email-protection#e78985c985889293828e8b8b8295a7808a868e8bc984888a" class="ml font-mono text-[12px]"><span class="__cf_email__" data-cfemail="325c501c505d4746575b5e5e574072555f535b5e1c515d5f">[email&#160;protected]</span></a>
+        <a href="https://nbouteiller.itch.io/diane-simulateur" rel="noopener noreferrer" class="font-mono font-bold text-[12px]" style="color:var(--c-fr);text-decoration:none;border-bottom:1px solid rgba(139,164,200,.28);padding-bottom:1px">nbouteiller.itch.io →</a>
+      </div>
+    </div>
+    <div style="height:1px;background:rgba(255,255,255,.05);margin-bottom:16px"></div>
+    <div class="flex justify-between items-center flex-wrap gap-3">
+      <span class="text-[11px]" style="color:rgba(255,255,255,.18)">simulation médicale · soins intensifs · smur · réanimation · usage non médical</span>
+      <div class="flex items-center gap-2">
+        <span class="text-[11px]" style="color:rgba(255,255,255,.2)">Codé avec</span>
+        <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" class="font-bold text-[11px] px-2.5 py-1 rounded" style="background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.16);color:#e8a855;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,149,0,.14)'" onmouseout="this.style.background='rgba(255,149,0,.07)'">Claude</a>
+        <span class="text-[11px]" style="color:rgba(255,255,255,.2)">&</span>
+        <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="font-bold text-[11px] px-2.5 py-1 rounded" style="background:rgba(66,133,244,.07);border:1px solid rgba(66,133,244,.16);color:#7aabef;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(66,133,244,.14)'" onmouseout="this.style.background='rgba(66,133,244,.07)'">Google AI Studio</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /z-3 -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════
+// ── Play Now — injection iframe au clic ────────────────
+// ══════════════════════════════════════════════════════════
+function launchSim() {
+  const placeholder = document.getElementById('play-placeholder');
+  if (!placeholder) return;
+  const iframe = document.createElement('iframe');
+  iframe.src             = 'diane-v12-2.html';
+  iframe.allowFullscreen = true;
+  iframe.allow           = 'autoplay; fullscreen; keyboard; gamepad';
+  iframe.style.cssText   = 'position:absolute;inset:0;width:100%;height:100%;border:none;display:block;';
+  placeholder.style.transition = 'opacity .35s ease';
+  placeholder.style.opacity    = '0';
+  setTimeout(() => {
+    placeholder.remove();
+    document.getElementById('play-wrapper').appendChild(iframe);
+    const btn = document.getElementById('btn-fullscreen');
+    if (btn) btn.classList.add('visible');
+  }, 350);
+}
+
+// ── Plein écran sur le wrapper ───────────────────────────
+function toggleFullscreen() {
+  const wrapper = document.getElementById('play-wrapper');
+  const isFs    = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+  if (!isFs) {
+    const req = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen || wrapper.mozRequestFullScreen;
+    if (req) req.call(wrapper);
+  } else {
+    const ex = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+    if (ex) ex.call(document);
+  }
+}
+document.addEventListener('fullscreenchange',      updateFsBtn);
+document.addEventListener('webkitfullscreenchange',updateFsBtn);
+document.addEventListener('mozfullscreenchange',   updateFsBtn);
+function updateFsBtn() {
+  const btn  = document.getElementById('btn-fullscreen');
+  if (!btn) return;
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+  btn.innerHTML = isFs ? '&#x2715;&nbsp;Quitter' : '&#x26F6;&nbsp;Plein écran';
+}
+
+// ── Contact Modal ────────────────────────────────────────
+function openContactModal() {
+  const modal = document.getElementById('contact-modal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  document.getElementById('contact-form-wrap').style.display = 'block';
+  document.getElementById('contact-success').style.display = 'none';
+  document.getElementById('cf-error').style.display = 'none';
+  ['cf-name','cf-email','cf-subject','cf-message'].forEach(id => { document.getElementById(id).value = ''; });
+}
+function closeContactModal() {
+  document.getElementById('contact-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeContactModal(); });
+
+async function submitContactForm() {
+  const name    = document.getElementById('cf-name').value.trim();
+  const email   = document.getElementById('cf-email').value.trim();
+  const subject = document.getElementById('cf-subject').value.trim();
+  const message = document.getElementById('cf-message').value.trim();
+  const errEl   = document.getElementById('cf-error');
+  const btn     = document.getElementById('cf-submit');
+  if (!name || !email || !message) {
+    errEl.textContent = 'Merci de renseigner votre nom, votre e-mail et votre message.';
+    errEl.style.display = 'block'; return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Adresse e-mail invalide.';
+    errEl.style.display = 'block'; return;
+  }
+  errEl.style.display = 'none';
+  btn.textContent = 'Envoi en cours…'; btn.style.opacity = '.7'; btn.disabled = true;
+  try {
+    const res = await fetch('https://formspree.io/f/mojpqpqr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ name, email, subject: subject || 'Contact depuis DIANE Simulateur', message })
+    });
+    if (res.ok) {
+      document.getElementById('contact-form-wrap').style.display = 'none';
+      document.getElementById('contact-success').style.display = 'block';
+    } else { throw new Error(); }
+  } catch(e) {
+    const b = encodeURIComponent('Nom : ' + name + '\nDe : ' + email + '\n\n' + message);
+    const s = encodeURIComponent(subject || 'Contact depuis DIANE Simulateur');
+    window.location.href = 'mailto:nb.bouteiller@gmail.com?subject=' + s + '&body=' + b;
+    document.getElementById('contact-form-wrap').style.display = 'none';
+    document.getElementById('contact-success').style.display = 'block';
+  } finally {
+    btn.textContent = 'Envoyer le message →'; btn.style.opacity = '1'; btn.disabled = false;
+  }
+}
+
+// ── Scroll Reveal Engine ─────────────────────────────────
+function splitWords(el) {
+  if (el.dataset.splitDone) return;
+  el.dataset.splitDone = '1';
+  const walk = (node, depth) => {
+    if (depth > 0 && node.nodeType === Node.ELEMENT_NODE) {
+      node.childNodes.forEach(c => walk(c, depth + 1));
+      return;
+    }
+    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+      const words = node.textContent.split(/(\s+)/);
+      const frag  = document.createDocumentFragment();
+      words.forEach(w => {
+        if (!w.trim()) { frag.appendChild(document.createTextNode(w)); return; }
+        const outer = document.createElement('span');
+        outer.className = 'word';
+        const inner = document.createElement('span');
+        inner.className = 'word-inner';
+        inner.textContent = w;
+        outer.appendChild(inner);
+        frag.appendChild(outer);
+      });
+      node.parentNode.replaceChild(frag, node);
+    }
+  };
+  el.childNodes.forEach(c => walk(c, 0));
+}
+
+function staggerWords(el) {
+  el.querySelectorAll('.word-inner').forEach((span, i) => {
+    span.style.transitionDelay = (i * 38) + 'ms';
+  });
+}
+
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    if (el.classList.contains('reveal-words')) {
+      staggerWords(el);
+      requestAnimationFrame(() => el.classList.add('visible'));
+    } else if (el.classList.contains('reveal-lines')) {
+      el.querySelectorAll('.line-inner').forEach((ln, i) => { ln.style.transitionDelay = (i * 80) + 'ms'; });
+      requestAnimationFrame(() => el.classList.add('visible'));
+    } else {
+      el.classList.add('visible');
+    }
+    revealObs.unobserve(el);
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('h1, h2, h3').forEach(el => {
+    if (el.closest('.glass') || el.closest('.info-card') || el.closest('#contact-modal')) return;
+    el.classList.add('reveal-words');
+    splitWords(el);
+    revealObs.observe(el);
+  });
+  document.querySelectorAll('p, .badge').forEach(el => {
+    if (el.closest('.glass') || el.closest('.info-card') || el.closest('#contact-modal') || el.closest('.fade-up')) return;
+    const wrapper = document.createElement('span');
+    wrapper.className = 'line-inner';
+    wrapper.innerHTML = el.innerHTML;
+    el.classList.add('reveal-lines');
+    el.innerHTML = '';
+    el.appendChild(wrapper);
+    revealObs.observe(el);
+  });
+  document.querySelectorAll('.fade-up').forEach(el => revealObs.observe(el));
+});
+
+// ── Nav scroll ──────────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 50) {
+    nav.style.background     = 'rgba(6,8,16,.82)';
+    nav.style.backdropFilter = 'blur(24px)';
+    nav.style.borderBottom   = '1px solid rgba(255,255,255,.05)';
+  } else {
+    nav.style.background     = 'transparent';
+    nav.style.backdropFilter = 'none';
+    nav.style.borderBottom   = 'none';
+  }
+}, { passive: true });
+
+// ══════════════════════════════════════════════════════════
+// ── WAVE ENGINE — Phosphore scrolling (original) ────────
+// ══════════════════════════════════════════════════════════
+const CSS_COLORS = {
+  ecg:   '#6fcf97',
+  pleth: '#7eb8d4',
+  capno: '#c8be8a',
+};
+
+function makeWave(id, color, bpm, type, H) {
+  const cv  = document.getElementById(id);
+  if (!cv) return;
+  const ctn = cv.parentElement;
+  let pts = [], frame = 0, W = 0;
+
+  const ecgY = ph => {
+    const b = H*.5;
+    if (ph<.06)  return b;
+    if (ph<.10)  return b - H*.04  * Math.sin((ph-.06)/.04*Math.PI);
+    if (ph<.13)  return b;
+    if (ph<.145) return b + H*.03  * Math.sin((ph-.13)/.015*Math.PI);
+    if (ph<.17)  return b - H*.45  * Math.sin((ph-.145)/.025*Math.PI);
+    if (ph<.195) return b + H*.12  * Math.sin((ph-.17)/.025*Math.PI);
+    if (ph<.24)  return b;
+    if (ph<.34)  return b - H*.09  * Math.sin((ph-.24)/.10*Math.PI);
+    return b;
+  };
+  const plethY = ph => {
+    const m = H*.55;
+    if (ph<.04) return m;
+    if (ph<.14) return m - H*.38 * Math.sin((ph-.04)/.10*Math.PI*.5);
+    if (ph<.20) { const _t=(ph-.14)/.06; return m - H*.38 + H*.20*_t; }
+    if (ph<.55) { const _t=(ph-.20)/.35; return m - H*.12 * Math.exp(-_t*3); }
+    return m;
+  };
+  const capnoY = ph => {
+    const base=H*.82, plat=H*.18;
+    if (ph<.08) return base;
+    if (ph<.14) { const s=(ph-.08)/.06; return base+(plat-base)*s*s*(3-2*s); }
+    if (ph<.48) return plat + (ph-.14)/.34*H*.04;
+    if (ph<.54) { const s=(ph-.48)/.06; return (plat+H*.04)+(base-plat-H*.04)*s*s*(3-2*s); }
+    return base;
+  };
+
+  const resize = () => {
+    W = ctn.clientWidth || 300;
+    cv.width  = W;
+    cv.height = H;
+  };
+  resize();
+  new ResizeObserver(resize).observe(ctn);
+
+  const draw = () => {
+    frame++;
+    const per   = type==='capno' ? 60/16 : 60/bpm;
+    const phase = ((frame*.033) % per) / per;
+    const y     = type==='ecg' ? ecgY(phase) : type==='pleth' ? plethY(phase) : capnoY(phase);
+    pts.push(y);
+    if (pts.length > Math.floor(W/2)) pts.shift();
+
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#010203';
+    ctx.fillRect(0, 0, W, H);
+
+    // Grille phosphore
+    ctx.strokeStyle = 'rgba(28,44,55,.2)';
+    ctx.lineWidth   = .4;
+    for (let x=0; x<W; x+=20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y=0; y<H; y+=15) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    if (pts.length > 1) {
+      [[8,.06],[5,.13],[3,.28],[1.5,1]].forEach(([lw, al]) => {
+        ctx.globalAlpha = al; ctx.lineWidth = lw;
+        ctx.strokeStyle = color; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath();
+        pts.forEach((py, i) => i===0 ? ctx.moveTo(i*2, py) : ctx.lineTo(i*2, py));
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+      const lx = (pts.length-1)*2, ly = pts[pts.length-1];
+      ctx.globalAlpha = .5; ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(lx, ly, 1.5, 0, Math.PI*2); ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  };
+  draw();
+}
+
+// ── Appels de tracés — Hero + Bento + Cockpit ───────────
+makeWave('ecg-hero', CSS_COLORS.ecg,   72, 'ecg',   76);
+makeWave('f-ecg',    CSS_COLORS.ecg,   72, 'ecg',   54);
+makeWave('f-pleth',  CSS_COLORS.pleth, 72, 'pleth', 42);
+makeWave('f-capno',  CSS_COLORS.capno, 16, 'capno', 36);
+makeWave('m-ecg',    CSS_COLORS.ecg,   72, 'ecg',   48);
+makeWave('m-pleth',  CSS_COLORS.pleth, 72, 'pleth', 36);
+makeWave('m-capno',  CSS_COLORS.capno, 16, 'capno', 30);
+
+// ══════════════════════════════════════════════════════════
+// ── SYSTÈME DE PARTICULES — poussière données ───────────
+// ══════════════════════════════════════════════════════════
+(function initParticles() {
+  const cv  = document.getElementById('particle-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+
+  // Couleurs issues des CSS vars
+  const COLS = ['#6fcf97', '#7eb8d4', '#c8be8a', '#b093c8', '#8ba4c8'];
+  const COUNT = 62;
+  let W, H;
+  const pts = [];
+
+  const resize = () => {
+    W = cv.width  = window.innerWidth;
+    H = cv.height = window.innerHeight;
+  };
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  for (let i = 0; i < COUNT; i++) {
+    pts.push({
+      x:  Math.random() * window.innerWidth,
+      y:  Math.random() * window.innerHeight,
+      vx: (Math.random() - .5) * .15,
+      vy: (Math.random() - .5) * .15,
+      r:  Math.random() * 1.1 + .25,
+      a:  Math.random() * .22 + .05,
+      c:  COLS[i % COLS.length],
+      // Variation sinusoïdale légère pour "flottement"
+      wt: Math.random() * Math.PI * 2,  // wave time offset
+      ws: (Math.random() * .004 + .002), // wave speed
+      wa: (Math.random() * .18 + .04),   // wave amplitude
+    });
+  }
+
+  let tick = 0;
+  function animate() {
+    tick++;
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach(p => {
+      p.wt += p.ws;
+      p.x  += p.vx + Math.sin(p.wt) * p.wa;
+      p.y  += p.vy + Math.cos(p.wt * .7) * p.wa * .6;
+      // Wrap autour de l'écran
+      if (p.x < -5)  p.x = W + 5;
+      if (p.x > W+5) p.x = -5;
+      if (p.y < -5)  p.y = H + 5;
+      if (p.y > H+5) p.y = -5;
+      // Rendu
+      ctx.globalAlpha = p.a;
+      ctx.fillStyle   = p.c;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ══════════════════════════════════════════════════════════
+// ── SPOTLIGHT — gradient radial sur les cartes .glass ───
+// ══════════════════════════════════════════════════════════
+document.querySelectorAll('.glass').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - r.left)  + 'px');
+    card.style.setProperty('--my', (e.clientY - r.top)   + 'px');
+  }, { passive: true });
+  card.addEventListener('mouseleave', () => {
+    card.style.setProperty('--mx', '-200px');
+    card.style.setProperty('--my', '-200px');
+  });
+});
+
+// ══════════════════════════════════════════════════════════
+// ── MAGNETIC — effet de translation 2D sur "Lancer" ─────
+// ══════════════════════════════════════════════════════════
+(function initMagnetic() {
+  const btn = document.querySelector('.btn-launch');
+  if (!btn) return;
+
+  btn.addEventListener('mousemove', e => {
+    const r  = btn.getBoundingClientRect();
+    const cx = r.left + r.width  / 2;
+    const cy = r.top  + r.height / 2;
+    // Déplacement normalisé -1…+1, attraction max ±7px
+    const dx = ((e.clientX - cx) / (r.width  / 2)) * 7;
+    const dy = ((e.clientY - cy) / (r.height / 2)) * 5;
+    btn.style.transform  = `translateX(${dx.toFixed(2)}px) translateY(${(dy - 3).toFixed(2)}px) scale(1.04)`;
+    btn.style.boxShadow  = `0 ${(14 - dy).toFixed(1)}px 52px rgba(71,107,155,.58), 0 0 0 1px rgba(148,185,220,.28)`;
+    btn.style.animation  = 'none';
+  }, { passive: true });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = '';
+    btn.style.boxShadow = '';
+    // Relance l'animation pulse après le retour en douceur (transition CSS gère le retour)
+    setTimeout(() => { btn.style.animation = ''; }, 350);
+  });
+})();
+</script>
+
+<!-- ═══ VEILLE SANITAIRE SPF — Script ═══ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ─────────────────────────────────────────────────────────────
+     Architecture : Netlify Function comme backend proxy
+     → /.netlify/functions/get-urgences
+     Côté serveur : fetch data.gouv.fr sans CORS, parse CSV,
+     retourne JSON propre { ok, passages, txHostit, date, source }
+
+     Fallback : données de référence SPF OSCOUR® 2024 annotées,
+     affichées immédiatement si la fonction échoue ou est hors-ligne.
+  ───────────────────────────────────────────────────────────── */
+
+  const FUNCTION_URL = '/.netlify/functions/get-urgences';
+
+  /* Données de référence SPF OSCOUR® — moyennes hebdomadaires nationales 2024 */
+  const FALLBACK = {
+    passages : 47600,
+    txHostit : 18.2,
+    date     : 'Référence hebdomadaire — SPF OSCOUR® 2024',
+    live     : false,
+  };
+
+  const el = id => document.getElementById(id);
+
+  /* ── Timeout via Promise.race ── */
+  const withTimeout = (p, ms) => Promise.race([
+    p,
+    new Promise((_, rej) => setTimeout(() => rej(new Error(`Délai dépassé (${ms}ms)`)), ms)),
+  ]);
+
+  /* ── Indicateur de tension ── */
+  function getTension(p) {
+    if (!p || isNaN(p)) return { label: 'INCONNU',    color: 'rgba(255,255,255,.3)', glow: 'none' };
+    if (p < 40000)       return { label: 'NORMAL ✓',  color: '#4caf50', glow: '0 0 10px rgba(76,175,80,.5)' };
+    if (p < 55000)       return { label: 'ÉLEVÉ ▲',   color: '#ffd600', glow: '0 0 10px rgba(255,214,0,.5)' };
+    return               { label: 'CRITIQUE ⚠', color: '#ff3b3b', glow: '0 0 10px rgba(255,59,59,.5)' };
+  }
+
+  /* ── Masquer le spinner ── */
+  function hideLoading() {
+    const l = el('spf-loading');
+    if (!l) return;
+    l.style.transition = 'opacity .4s ease';
+    l.style.opacity    = '0';
+    setTimeout(() => l.parentNode && l.parentNode.removeChild(l), 420);
+  }
+
+  /* ── Rendu des données dans la card ── */
+  function renderData(d) {
+    hideLoading();
+
+    const fmt = n => (n != null && !isNaN(n)) ? Math.round(n).toLocaleString('fr-FR') : '—';
+    const t   = getTension(d.passages);
+
+    /* Valeurs numériques avec animation d'entrée */
+    [
+      ['spf-passages', fmt(d.passages),                                      '0s'],
+      ['spf-hospit',   d.txHostit != null ? d.txHostit.toFixed(1) + ' %' : '—', '.1s'],
+    ].forEach(([id, val, delay]) => {
+      const e = el(id);
+      if (e) { e.textContent = val; e.style.animation = `spfFadeIn .5s ${delay} ease both`; }
+    });
+
+    /* Indicateur de tension */
+    const te = el('spf-tension');
+    if (te) {
+      te.textContent      = t.label;
+      te.style.color      = t.color;
+      te.style.textShadow = t.glow;
+      te.style.animation  = 'spfFadeIn .5s .2s ease both';
+    }
+
+    /* Date */
+    const de = el('spf-date');
+    if (de) de.textContent = 'Mise à jour : ' + (d.date || '—');
+
+    /* Source */
+    const se = el('spf-source');
+    if (se) se.textContent = d.live
+      ? `Source : ${d.source || 'Santé Publique France · OSCOUR® · data.gouv.fr'}`
+      : 'Source : SPF OSCOUR® · Mode Hors-ligne / Données Estimées';
+
+    /* Pastille : rouge clignotant = live | orange fixe = hors-ligne */
+    const dot  = el('spf-dot');
+    const lbl  = dot?.nextElementSibling;
+    if (!d.live) {
+      if (dot) {
+        dot.style.background  = '#ff9800';
+        dot.style.boxShadow   = '0 0 5px rgba(255,152,0,.6)';
+        dot.style.animation   = 'none';
+      }
+      if (lbl) {
+        lbl.textContent   = 'Mode Hors-ligne / Données Estimées';
+        lbl.style.color   = 'rgba(255,152,0,.7)';
+      }
+    }
+  }
+
+  /* ── Appel à la Netlify Function ── */
+  async function fetchFromFunction() {
+    const res  = await withTimeout(fetch(FUNCTION_URL), 12000);
+    if (!res.ok) throw new Error(`Netlify Function HTTP ${res.status}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Réponse invalide de la fonction');
+    return {
+      passages : json.passages,
+      txHostit : json.txHostit,
+      date     : json.date,
+      source   : json.source,
+      live     : true,
+    };
+  }
+
+  /* ── Point d'entrée ── */
+  async function init() {
+    try {
+      const data = await fetchFromFunction();
+      renderData(data);
+    } catch (err) {
+      console.warn('[SPF] Netlify Function indisponible, fallback référence :', err.message);
+      renderData(FALLBACK);
+    }
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+# ── Configuration Netlify ──────────────────────────────────────
+[build]
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[functions."get-urgences"]
+  node_bundler = "esbuild"
+
+# Forcer Node 18 (fetch natif + compatibilité maximale)
+[context.production]
+  environment = { NODE_VERSION = "18" }
+
+[context.deploy-preview]
+  environment = { NODE_VERSION = "18" }
+
+[context.branch-deploy]
+  environment = { NODE_VERSION = "18" }
