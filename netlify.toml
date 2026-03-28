@@ -1,19 +1,27 @@
 # ── Configuration Netlify ──────────────────────────────────────
 [build]
-  functions = "netlify/functions"
+  functions  = "netlify/functions"
+  publish    = "."
 
 [functions]
   node_bundler = "esbuild"
 
-[functions."get-urgences"]
-  node_bundler = "esbuild"
+# Node 18 sur tous les contextes
+[context.production.environment]
+  NODE_VERSION = "18"
 
-# Forcer Node 18 (fetch natif + compatibilité maximale)
-[context.production]
-  environment = { NODE_VERSION = "18" }
+[context.deploy-preview.environment]
+  NODE_VERSION = "18"
 
-[context.deploy-preview]
-  environment = { NODE_VERSION = "18" }
+[context.branch-deploy.environment]
+  NODE_VERSION = "18"
 
-[context.branch-deploy]
-  environment = { NODE_VERSION = "18" }
+# ── Fonction planifiée ─────────────────────────────────────────
+# Mercredi 16h00 UTC (~18h heure française)
+# SPF publie généralement le mardi ou mercredi après-midi
+[functions."update-bulletin"]
+  schedule = "0 16 * * 3"
+
+# Retry le jeudi 10h UTC au cas où le bulletin serait sorti tard
+[functions."update-bulletin-retry"]
+  schedule = "0 10 * * 4"
