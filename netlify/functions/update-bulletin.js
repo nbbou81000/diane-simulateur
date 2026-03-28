@@ -246,7 +246,14 @@ exports.handler = async function () {
 
     const pdf = await httpsGet(pdfUrl, true);
     if (pdf.status !== 200) throw new Error(`PDF download HTTP ${pdf.status}`);
-    console.log(`[update-bulletin] PDF OK (${Math.round(pdf.body.length / 1024)} Ko)`);
+    /* Vérifier que c'est bien un PDF (commence par %PDF) */
+    const header = pdf.body.slice(0, 10).toString('ascii');
+    console.log(`[update-bulletin] PDF header: "${header}" — taille: ${Math.round(pdf.body.length / 1024)} Ko — URL: ${pdfUrl}`);
+    if (!header.startsWith('%PDF')) {
+      /* Ce n'est pas un PDF — afficher le début du contenu pour debug */
+      const preview = pdf.body.slice(0, 500).toString('utf-8').replace(/\n/g, ' ');
+      throw new Error(`Contenu non-PDF reçu. Header: "${header}". Aperçu: ${preview.slice(0, 200)}`);
+    }
 
     const data = await extractWithGemini(pdf.body.toString('base64'));
     console.log('[update-bulletin] Extrait:', data.semaine);
