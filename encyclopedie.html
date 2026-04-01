@@ -2,11 +2,6 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<!-- ═══ FAVICON ═══ -->
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
 <title>Encyclopédie Médicale — DIANE Simulateur</title>
 <meta name="description" content="Encyclopédie médicale haute-fidélité : termes de réanimation, soins intensifs, SMUR, métiers hospitaliers et système de santé français.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -296,38 +291,39 @@ footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:c
 (function () {
 
   const FALLBACK = {
-    semaine: 'S12 — 2026',
-    periode: '16 au 22 mars 2026',
-    numero: '1093',
-    date_publication: '24.03.2026',
-    passages_total:   361245,
-    passages_moins15: 83030,
-    passages_15_74:   220797,
-    passages_75plus:  57418,
-    hospit_total:   79125,
-    hospit_moins2:   3193,
-    hospit_2_14:     5629,
-    hospit_15_74:   42265,
-    hospit_75plus:  28035,
-    hospit_evol_total: 3.02,
+    semaine: 'S13 — 2026',
+    periode: '23 au 29 mars 2026',
+    numero: '1094',
+    date_publication: '31.03.2026',
+    passages_total:   351988,
+    passages_moins15: 81505,
+    passages_15_74:   215576,
+    passages_75plus:  54907,
+    hospit_total:   75727,
+    hospit_moins2:   3162,
+    hospit_2_14:     5395,
+    hospit_15_74:   40276,
+    hospit_75plus:  26890,
+    hospit_evol_total: -1.66,
     top10: [
-      { rang:1,  label:'Traumatisme',                          semaine:99623, prec:91728, var:8.61  },
-      { rang:2,  label:'Douleurs abdominales non spécifiques', semaine:18245, prec:18158, var:0.48  },
-      { rang:3,  label:'Douleur thoracique',                   semaine:13628, prec:13310, var:2.39  },
-      { rang:4,  label:'Malaise',                              semaine:12896, prec:12574, var:2.56  },
-      { rang:5,  label:'Infections ORL',                       semaine:11315, prec:10097, var:12.06 },
-      { rang:6,  label:'Neurologie autre',                     semaine:10612, prec:10365, var:2.38  },
-      { rang:7,  label:'Douleurs abdominales spécifiques',     semaine:10036, prec:10055, var:-0.19 },
-      { rang:8,  label:'Infection cutanée / sous-cutanée',     semaine:6071,  prec:5832,  var:4.10  },
-      { rang:9,  label:'Infection urinaire',                   semaine:5602,  prec:5293,  var:5.84  },
-      { rang:10, label:'Pneumopathie',                         semaine:4870,  prec:4862,  var:0.16  },
+      { rang:1,  label:'Traumatisme',                          semaine:93501, prec:97230, var:-3.84 },
+      { rang:2,  label:'Douleurs abdominales non spécifiques', semaine:18141, prec:17687, var:2.57  },
+      { rang:3,  label:'Douleur thoracique',                   semaine:13599, prec:13221, var:2.86  },
+      { rang:4,  label:'Malaise',                              semaine:12739, prec:12607, var:1.05  },
+      { rang:5,  label:'Infections ORL',                       semaine:11813, prec:10921, var:8.17  },
+      { rang:6,  label:'Neurologie autre',                     semaine:11046, prec:10260, var:7.66  },
+      { rang:7,  label:'Douleurs abdominales spécifiques',     semaine:9737,  prec:9742,  var:-0.05 },
+      { rang:8,  label:'Infection cutanée / sous-cutanée',     semaine:5915,  prec:5901,  var:0.24  },
+      { rang:9,  label:'Infection urinaire',                   semaine:5306,  prec:5426,  var:-2.21 },
+      { rang:10, label:'Gastro-entérite',                      semaine:4882,  prec:4468,  var:9.27  },
     ],
     points_cles: [
-      "Passages en hausse chez les enfants +10% (+8 046 passages) · hospitalisations <2 ans +6%",
-      "Infections ORL en progression dans toutes les classes d'âge +12% (+1 218 passages)",
-      "Fièvre isolée tous âges +17% · Traumatismes adultes +7% · 2-14 ans +13%",
-      "≥ 75 ans : douleur thoracique +9% · AVC +7%",
+      "S13-2026 (23-29 mars) : passages et hospitalisations stables dans toutes les classes d'âge",
+      "Infections ORL en hausse : <15 ans +9% (+681) · 15-74 ans +8% (+236) · Fièvre isolée 15-74 ans +13% (+101)",
+      "Gastro-entérite <15 ans +11% (+340) · Varicelle <15 ans +35% (+114) · Conjonctivite <2 ans +24% (+49)",
+      "Santé mentale : geste suicidaire 45-64 ans +11% (+35) · Troubles des conduites 2-14 ans +10% (+71)",
     ],
+    /* mis à jour automatiquement le 01.04.2026 — bullnat_oscour_20260331.pdf */
   };
 
   const COLORS = ['#00e5ff','#a78bfa','#f87171','#fbbf24','#34d399','#7eb8d4','#a78bfa','#fbbf24','#34d399','#7eb8d4'];
