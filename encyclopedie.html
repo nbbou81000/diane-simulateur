@@ -291,39 +291,39 @@ footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:c
 (function () {
 
   const FALLBACK = {
-    semaine: 'S13 — 2026',
-    periode: '23 au 29 mars 2026',
-    numero: '1094',
-    date_publication: '31.03.2026',
-    passages_total:   351988,
-    passages_moins15: 81505,
-    passages_15_74:   215576,
-    passages_75plus:  54907,
-    hospit_total:   75727,
-    hospit_moins2:   3162,
-    hospit_2_14:     5395,
-    hospit_15_74:   40276,
-    hospit_75plus:  26890,
-    hospit_evol_total: -1.66,
+    semaine: 'S14 — 2026',
+    periode: '30 mars au 05 avril 2026',
+    numero: '1095',
+    date_publication: '07.04.2026',
+    passages_total:   363183,
+    passages_moins15: 83326,
+    passages_15_74:   221366,
+    passages_75plus:  58491,
+    hospit_total:   79211,
+    hospit_moins2:   3196,
+    hospit_2_14:     5579,
+    hospit_15_74:   41931,
+    hospit_75plus:  28503,
+    hospit_evol_total: 1.84,
     top10: [
-      { rang:1,  label:'Traumatisme',                          semaine:93501, prec:97230, var:-3.84 },
-      { rang:2,  label:'Douleurs abdominales non spécifiques', semaine:18141, prec:17687, var:2.57  },
-      { rang:3,  label:'Douleur thoracique',                   semaine:13599, prec:13221, var:2.86  },
-      { rang:4,  label:'Malaise',                              semaine:12739, prec:12607, var:1.05  },
-      { rang:5,  label:'Infections ORL',                       semaine:11813, prec:10921, var:8.17  },
-      { rang:6,  label:'Neurologie autre',                     semaine:11046, prec:10260, var:7.66  },
-      { rang:7,  label:'Douleurs abdominales spécifiques',     semaine:9737,  prec:9742,  var:-0.05 },
-      { rang:8,  label:'Infection cutanée / sous-cutanée',     semaine:5915,  prec:5901,  var:0.24  },
-      { rang:9,  label:'Infection urinaire',                   semaine:5306,  prec:5426,  var:-2.21 },
-      { rang:10, label:'Gastro-entérite',                      semaine:4882,  prec:4468,  var:9.27  },
+      { rang:1,  label:'Traumatisme',                          semaine:94103, prec:95542, var:-1.51 },
+      { rang:2,  label:'Douleurs abdominales non spécifiques', semaine:18792, prec:18753, var:0.21  },
+      { rang:3,  label:'Douleur thoracique',                   semaine:14028, prec:13943, var:0.61  },
+      { rang:4,  label:'Malaise',                              semaine:13321, prec:12948, var:2.88  },
+      { rang:5,  label:'Infections ORL',                       semaine:12809, prec:12194, var:5.04  },
+      { rang:6,  label:'Neurologie autre',                     semaine:10944, prec:11334, var:-3.44 },
+      { rang:7,  label:'Douleurs abdominales spécifiques',     semaine:9994,  prec:10081, var:-0.86 },
+      { rang:8,  label:'Infection cutanée / sous-cutanée',     semaine:6373,  prec:6165,  var:3.37  },
+      { rang:9,  label:'Infection urinaire',                   semaine:5632,  prec:5490,  var:2.59  },
+      { rang:10, label:'Gastro-entérite',                      semaine:5352,  prec:5027,  var:6.47  },
     ],
     points_cles: [
-      "S13-2026 (23-29 mars) : passages et hospitalisations stables dans toutes les classes d'âge",
-      "Infections ORL en hausse : <15 ans +9% (+681) · 15-74 ans +8% (+236) · Fièvre isolée 15-74 ans +13% (+101)",
-      "Gastro-entérite <15 ans +11% (+340) · Varicelle <15 ans +35% (+114) · Conjonctivite <2 ans +24% (+49)",
-      "Santé mentale : geste suicidaire 45-64 ans +11% (+35) · Troubles des conduites 2-14 ans +10% (+71)",
+      "S14-2026 (30 mars – 5 avril) : passages en hausse de 6% chez les 75 ans et plus (+3 708 passages) ; stables dans les autres classes d'âge",
+      "Hospitalisations stables dans toutes les classes d'âge ; légère hausse chez les 75 ans et plus (+4,43%, +1 208 hospit.)",
+      "Infections ORL en hausse chez les <15 ans (+6%, +540) ; Gastro-entérite <15 ans +9% (+324) ; Crise d'asthme <2 ans +8% (+59) ; Infection urinaire <2 ans +12% (+33)",
+      "Chez les 75 ans et plus : malaise +12% (+504), AVC +7% (+114), infection urinaire +6% (+89), fièvre isolée +8% (+27), allergie +21% (+22)",
     ],
-    /* mis à jour automatiquement le 01.04.2026 — bullnat_oscour_20260331.pdf */
+    /* mis à jour automatiquement le 07.04.2026 — bullnat_oscour_20260407.pdf */
   };
 
   const COLORS = ['#00e5ff','#a78bfa','#f87171','#fbbf24','#34d399','#7eb8d4','#a78bfa','#fbbf24','#34d399','#7eb8d4'];
@@ -903,9 +903,4 @@ document.getElementById('search').addEventListener('input', filterCards);
 buildFilters();
 buildCards();
 buildProfs();
-buildSante();
-// Observe all .reveal after DOM build
-setTimeout(()=>{ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el)); }, 50);
-</script>
-</body>
-</html>
+buildS
